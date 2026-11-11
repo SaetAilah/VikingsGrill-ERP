@@ -50,19 +50,27 @@ INSERT INTO recipe_ingredients (menu_item_id, inventory_item_id, quantity_requir
   (8, 1, 0.300)  -- Lechon Kawali -> 300g Pork belly
 ON DUPLICATE KEY UPDATE quantity_required = VALUES(quantity_required);
 
+-- 4.5. Central Roles Table (Customer Feedback & RBAC Compatibility)
+INSERT INTO roles (id, role_name) VALUES
+  (1, 'Administrator'),
+  (2, 'Manager'),
+  (3, 'Staff'),
+  (4, 'Customer'),
+  (5, 'Owner')
+ON DUPLICATE KEY UPDATE role_name = VALUES(role_name);
+
 -- 5. Users (Default system accounts)
 -- Password for all accounts is 'password123'
--- Hash: $2b$10$yFfX6xW49p0P0p3t1U6W0eA9F4j9C4C6O.QxQxQxQxQxQxQxQxQxQ or standard bcrypt
-INSERT INTO users (id, name, email, phone, password_hash, role, employee_id, is_active) VALUES
-  (1, 'Michelle Saet (Owner)', 'owner@vikingsgrill.example', '09170000001', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'Owner', 'EMP-001', TRUE),
-  (2, 'Operations Manager', 'manager@vikingsgrill.example', '09170000002', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'Manager', 'EMP-002', TRUE),
-  (3, 'Lead Cashier', 'cashier@vikingsgrill.example', '09170000003', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'cashier', 'EMP-003', TRUE),
-  (4, 'Kitchen Lead', 'kitchen@vikingsgrill.example', '09170000004', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'kitchen_staff', 'EMP-004', TRUE),
-  (5, 'HR Specialist', 'hr@vikingsgrill.example', '09170000005', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'hr_staff', 'EMP-005', TRUE),
-  (6, 'Accountant', 'accounting@vikingsgrill.example', '09170000006', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'accounting_staff', 'EMP-006', TRUE),
-  (7, 'Juan Dela Cruz', 'juan@example.ph', '09181234567', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'customer', NULL, TRUE),
-  (8, 'Maria Clara', 'maria@example.ph', '09199876543', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'customer', NULL, TRUE) AS new
-ON DUPLICATE KEY UPDATE name = new.name, phone = new.phone, role = new.role;
+INSERT INTO users (id, name, email, phone, password_hash, password, role, role_id, employee_id, is_active) VALUES
+  (1, 'Michelle Saet (Owner)', 'owner@vikingsgrill.example', '09170000001', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'Owner', 5, 'EMP-001', TRUE),
+  (2, 'Operations Manager', 'manager@vikingsgrill.example', '09170000002', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'Manager', 2, 'EMP-002', TRUE),
+  (3, 'Lead Cashier', 'cashier@vikingsgrill.example', '09170000003', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'cashier', 3, 'EMP-003', TRUE),
+  (4, 'Kitchen Lead', 'kitchen@vikingsgrill.example', '09170000004', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'kitchen_staff', 3, 'EMP-004', TRUE),
+  (5, 'HR Specialist', 'hr@vikingsgrill.example', '09170000005', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'hr_staff', 3, 'EMP-005', TRUE),
+  (6, 'Accountant', 'accounting@vikingsgrill.example', '09170000006', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'accounting_staff', 3, 'EMP-006', TRUE),
+  (7, 'Juan Dela Cruz', 'juan@example.ph', '09181234567', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'customer', 4, NULL, TRUE),
+  (8, 'Maria Clara', 'maria@example.ph', '09199876543', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'customer', 4, NULL, TRUE) AS new
+ON DUPLICATE KEY UPDATE name = new.name, phone = new.phone, password = new.password, password_hash = new.password_hash, role = new.role, role_id = new.role_id;
 
 -- 6. Customer Profiles
 INSERT INTO customer_profiles (user_id, phone, address, loyalty_points, preferences) VALUES

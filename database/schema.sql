@@ -20,12 +20,18 @@ USE vikings_erp;
 -- SECTION 1: AUTHENTICATION, USERS & CENTRALIZED RBAC
 -- ====================================================================
 
+CREATE TABLE IF NOT EXISTS roles (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  role_name VARCHAR(50) NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS users (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(120) NOT NULL,
   email VARCHAR(191) NOT NULL UNIQUE,
   phone VARCHAR(30) DEFAULT NULL,
-  password_hash VARCHAR(255) NOT NULL,
+  password_hash VARCHAR(255) NULL,
+  password VARCHAR(255) NULL,
   role ENUM(
     'customer',
     'reservation_staff',
@@ -40,13 +46,46 @@ CREATE TABLE IF NOT EXISTS users (
     'Staff',
     'administrator'
   ) NOT NULL DEFAULT 'customer',
+  role_id INT UNSIGNED NULL,
   employee_id VARCHAR(50) DEFAULT NULL,
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_user_email (email),
-  INDEX idx_user_role (role)
+  INDEX idx_user_role (role),
+  INDEX idx_user_role_id (role_id),
+  FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
+
+DELIMITER //
+CREATE TRIGGER IF NOT EXISTS trg_users_sync_insert
+BEFORE INSERT ON users
+FOR EACH ROW
+BEGIN
+  IF NEW.password_hash IS NULL AND NEW.password IS NOT NULL THEN
+    SET NEW.password_hash = NEW.password;
+  ELSEIF NEW.password IS NULL AND NEW.password_hash IS NOT NULL THEN
+    SET NEW.password = NEW.password_hash;
+  END IF;
+  IF NEW.role_id IS NULL AND NEW.role IS NOT NULL THEN
+    SET NEW.role_id = CASE
+      WHEN NEW.role IN ('administrator', 'Administrator') THEN 1
+      WHEN NEW.role IN ('Manager', 'management') THEN 2
+      WHEN NEW.role IN ('Owner') THEN 5
+      WHEN NEW.role IN ('customer', 'Customer') THEN 4
+      ELSE 3
+    END;
+  ELSEIF NEW.role IS NULL AND NEW.role_id IS NOT NULL THEN
+    SET NEW.role = CASE
+      WHEN NEW.role_id = 1 THEN 'administrator'
+      WHEN NEW.role_id = 2 THEN 'Manager'
+      WHEN NEW.role_id = 5 THEN 'Owner'
+      WHEN NEW.role_id = 4 THEN 'customer'
+      ELSE 'Staff'
+    END;
+  END IF;
+END //
+DELIMITER ;
 
 CREATE TABLE IF NOT EXISTS auth_sessions (
   token_hash CHAR(64) NOT NULL PRIMARY KEY,
