@@ -3,6 +3,11 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout.jsx';
 import { PosProvider } from './context/PosContext.jsx';
 import { InventoryProvider } from './context/InventoryContext.jsx';
+import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
+
+// Auth & Public Pages
+import UnifiedAuthPage from './pages/auth/UnifiedAuthPage.jsx';
+import CustomerPortal from './pages/CustomerPortal.jsx';
 
 // POS Pages
 import POSDashboard from './pages/pos/POSDashboard.jsx';
@@ -31,7 +36,27 @@ export default function App() {
     <PosProvider>
       <InventoryProvider>
         <Routes>
-          <Route element={<MainLayout />}>
+          {/* Public Authentication Route */}
+          <Route path="/login" element={<UnifiedAuthPage />} />
+
+          {/* Customer Self-Service Portal Route */}
+          <Route
+            path="/customer"
+            element={
+              <ProtectedRoute allowedRoles={['customer', 'Owner', 'Manager']}>
+                <CustomerPortal />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Staff & Management Protected Routes */}
+          <Route
+            element={
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            }
+          >
             <Route path="/" element={<Navigate to="/pos/orders" replace />} />
 
             {/* Front of House (POS) Routes */}
@@ -64,4 +89,3 @@ export default function App() {
     </PosProvider>
   );
 }
-

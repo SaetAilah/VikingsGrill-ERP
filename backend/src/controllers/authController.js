@@ -24,39 +24,65 @@ export const register = async (req, res, next) => {
   const name = String(req.body?.name || '').trim();
   const email = String(req.body?.email || '').trim().toLowerCase();
   const password = String(req.body?.password || '');
+  const phone = String(req.body?.phone || '').trim();
+  const requestedRole = String(req.body?.role || '').trim();
 
   if (
     name.length < 2 ||
     name.length > 80 ||
     !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
     email.length > 190 ||
-    password.length < 8 ||
+    password.length < 6 ||
     password.length > 128
   ) {
     return res.status(400).json({
-      error: 'Enter a name, a valid email, and a password between 8 and 128 characters.',
+      error: 'Enter a name, a valid email, and a password with at least 6 characters.',
     });
   }
 
+  const validRoles = [
+    'customer',
+    'reservation_staff',
+    'kitchen_staff',
+    'cashier',
+    'inventory_staff',
+    'hr_staff',
+    'accounting_staff',
+    'management',
+    'Owner',
+    'Manager',
+    'Staff',
+    'administrator',
+  ];
+
+  let role = validRoles.includes(requestedRole) ? requestedRole : 'customer';
+
   let connection;
-  let ownerLockAcquired = false;
   try {
     const passwordHash = await hashPassword(password);
     connection = await pool.getConnection();
-    const [lockRows] = await connection.query("SELECT GET_LOCK('vikings_erp_first_owner', 10) AS acquired");
-    ownerLockAcquired = Number(lockRows[0].acquired) === 1;
-    if (!ownerLockAcquired) return res.status(503).json({ error: 'Account setup is busy. Please try again.' });
 
     const [owners] = await connection.query("SELECT COUNT(*) AS count FROM users WHERE role = 'Owner'");
-    const role = Number(owners[0].count) === 0 ? 'Owner' : 'Staff';
+    if (Number(owners[0].count) === 0) {
+      role = 'Owner';
+    }
 
     const [result] = await connection.query(
-      'INSERT INTO users (full_name, email, password_hash, role) VALUES (?, ?, ?, ?)',
-      [name, email, `${passwordHash.salt}:${passwordHash.digest}`, role],
+      'INSERT INTO users (name, email, phone, password_hash, password, role) VALUES (?, ?, ?, ?, ?, ?)',
+      [name, email, phone || null, passwordHash, passwordHash, role],
     );
 
-    const user = { id: result.insertId, full_name: name, email, role };
-    const token = await createSession(user.id);
+    const userId = result.insertId;
+
+    if (role === 'customer') {
+      await connection.query(
+        'INSERT INTO customer_profiles (user_id, phone) VALUES (?, ?) ON DUPLICATE KEY UPDATE phone = VALUES(phone)',
+        [userId, phone],
+      );
+    }
+
+    const user = { id: userId, name, full_name: name, email, phone, role };
+    const token = await createSession(userId);
     res.status(201).json({ token, user: userView(user) });
   } catch (error) {
     if (error.code === 'ER_DUP_ENTRY') {
@@ -64,12 +90,7 @@ export const register = async (req, res, next) => {
     }
     next(error);
   } finally {
-    if (connection) {
-      if (ownerLockAcquired) {
-        await connection.query("SELECT RELEASE_LOCK('vikings_erp_first_owner')").catch(() => {});
-      }
-      connection.release();
-    }
+    if (connection) connection.release();
   }
 };
 
@@ -82,7 +103,7 @@ export const login = async (req, res, next) => {
 
   try {
     const [rows] = await pool.query(
-      'SELECT id, full_name, email, password_hash, role, is_active FROM users WHERE email = ?',
+      'SELECT id, name, name AS full_name, email, phone, password_hash, password, role, role_id, is_active FROM users WHERE email = ?',
       [email],
     );
     if (!rows.length) return res.status(401).json({ error: 'Invalid email or password.' });
@@ -92,7 +113,7 @@ export const login = async (req, res, next) => {
       return res.status(403).json({ error: 'This account has been deactivated. Contact an administrator.' });
     }
 
-    const isValid = await verifyPassword(password, user.password_hash);
+    const isValid = await verifyPassword(password, user.password_hash || user.password);
     if (!isValid) return res.status(401).json({ error: 'Invalid email or password.' });
 
     const token = await createSession(user.id);
@@ -118,6 +139,3 @@ export const logout = async (req, res, next) => {
     next(error);
   }
 };
-
-export default { register, login, me, logout };
-

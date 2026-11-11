@@ -8,7 +8,7 @@ export const authenticate = async (req, res, next) => {
 
   try {
     const [rows] = await pool.query(
-      `SELECT u.id, u.full_name, u.email, u.role, u.is_active
+      `SELECT u.id, u.name, u.name AS full_name, u.email, u.role, u.is_active
        FROM auth_sessions s
        JOIN users u ON u.id = s.user_id
        WHERE s.token_hash = ? AND s.expires_at > CURRENT_TIMESTAMP AND u.is_active = 1`,
