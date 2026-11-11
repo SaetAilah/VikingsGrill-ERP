@@ -18,6 +18,10 @@ import {
   FileSpreadsheet,
   LogOut,
   ExternalLink,
+  Users,
+  Calendar,
+  DollarSign,
+  Star,
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -124,19 +128,63 @@ export default function Sidebar() {
             <span>Low-Stock Alerts</span>
           </NavLink>
 
-          {/* Companion Module Link */}
-          <div className="nav-section-title">Executive Suite</div>
+          {/* VikingsERP Ecosystem Links */}
+          <div className="nav-section-title">VikingsERP Integrated Modules</div>
+          <a
+            href="http://localhost:5176"
+            target="_blank"
+            rel="noreferrer"
+            className="nav-link"
+            style={{ opacity: 0.9 }}
+          >
+            <Calendar size={16} />
+            <span>Reservation & Queue</span>
+            <ExternalLink size={12} style={{ marginLeft: 'auto' }} />
+          </a>
+          <a
+            href="http://localhost:5177"
+            target="_blank"
+            rel="noreferrer"
+            className="nav-link"
+            style={{ opacity: 0.9 }}
+          >
+            <DollarSign size={16} />
+            <span>HR & Accounting</span>
+            <ExternalLink size={12} style={{ marginLeft: 'auto' }} />
+          </a>
+          <a
+            href="http://localhost:5178"
+            target="_blank"
+            rel="noreferrer"
+            className="nav-link"
+            style={{ opacity: 0.9 }}
+          >
+            <Star size={16} />
+            <span>Customer Feedback</span>
+            <ExternalLink size={12} style={{ marginLeft: 'auto' }} />
+          </a>
           <a
             href="http://localhost:5175"
             target="_blank"
             rel="noreferrer"
             className="nav-link"
-            style={{ opacity: 0.85 }}
+            style={{ opacity: 0.9 }}
           >
             <TrendingUp size={16} />
-            <span>RA & KPI Analytics</span>
+            <span>Reporting & KPI Suite</span>
             <ExternalLink size={12} style={{ marginLeft: 'auto' }} />
           </a>
+
+          {/* Administration (Owner only) */}
+          {isOwner && (
+            <>
+              <div className="nav-section-title">Administration</div>
+              <NavLink to="/team" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <Users size={16} />
+                <span>Team & Role Access</span>
+              </NavLink>
+            </>
+          )}
         </div>
       </div>
 

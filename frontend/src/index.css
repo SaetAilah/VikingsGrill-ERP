@@ -190,3 +190,39 @@ body {
   color: #ef4444;
 }
 
+/* Thermal Receipt Print Styles */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .unified-sidebar,
+  header,
+  .receipt-actions,
+  button,
+  .nav-section-title {
+    display: none !important;
+  }
+
+  .app-container,
+  .main-content,
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    width: 100% !important;
+  }
+
+  .receipt-card {
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+    padding: 10px !important;
+  }
+}
+

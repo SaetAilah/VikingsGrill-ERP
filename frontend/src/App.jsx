@@ -23,6 +23,9 @@ import PurchaseOrders from './pages/inventory/PurchaseOrders.jsx';
 import LowStockAlerts from './pages/inventory/LowStockAlerts.jsx';
 import InventoryReports from './pages/inventory/InventoryReports.jsx';
 
+// Administration
+import TeamManagement from './pages/TeamManagement.jsx';
+
 export default function App() {
   return (
     <PosProvider>
@@ -49,6 +52,9 @@ export default function App() {
             <Route path="/inventory/procurement" element={<PurchaseOrders />} />
             <Route path="/inventory/alerts" element={<LowStockAlerts />} />
             <Route path="/inventory/reports" element={<InventoryReports />} />
+
+            {/* Administration */}
+            <Route path="/team" element={<TeamManagement />} />
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/pos/orders" replace />} />
