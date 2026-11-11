@@ -62,14 +62,14 @@ ON DUPLICATE KEY UPDATE role_name = VALUES(role_name);
 -- 5. Users (Default system accounts)
 -- Password for all accounts is 'password123'
 INSERT INTO users (id, name, email, phone, password_hash, password, role, role_id, employee_id, is_active) VALUES
-  (1, 'Michelle Saet (Owner)', 'owner@vikingsgrill.example', '09170000001', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'Owner', 5, 'EMP-001', TRUE),
-  (2, 'Operations Manager', 'manager@vikingsgrill.example', '09170000002', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'Manager', 2, 'EMP-002', TRUE),
-  (3, 'Lead Cashier', 'cashier@vikingsgrill.example', '09170000003', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'cashier', 3, 'EMP-003', TRUE),
-  (4, 'Kitchen Lead', 'kitchen@vikingsgrill.example', '09170000004', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'kitchen_staff', 3, 'EMP-004', TRUE),
-  (5, 'HR Specialist', 'hr@vikingsgrill.example', '09170000005', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'hr_staff', 3, 'EMP-005', TRUE),
-  (6, 'Accountant', 'accounting@vikingsgrill.example', '09170000006', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'accounting_staff', 3, 'EMP-006', TRUE),
-  (7, 'Juan Dela Cruz', 'juan@example.ph', '09181234567', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'customer', 4, NULL, TRUE),
-  (8, 'Maria Clara', 'maria@example.ph', '09199876543', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', '$2a$10$7EqJtq98hPqEX7fNZaFWoOhiI78o4z/8Yf5n8O04lF2qH.E9mU7tC', 'customer', 4, NULL, TRUE) AS new
+  (1, 'Michelle Saet (Owner)', 'owner@vikingsgrill.example', '09170000001', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', 'Owner', 5, 'EMP-001', TRUE),
+  (2, 'Operations Manager', 'manager@vikingsgrill.example', '09170000002', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', 'Manager', 2, 'EMP-002', TRUE),
+  (3, 'Lead Cashier', 'cashier@vikingsgrill.example', '09170000003', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', 'cashier', 3, 'EMP-003', TRUE),
+  (4, 'Kitchen Lead', 'kitchen@vikingsgrill.example', '09170000004', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', 'kitchen_staff', 3, 'EMP-004', TRUE),
+  (5, 'HR Specialist', 'hr@vikingsgrill.example', '09170000005', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', 'hr_staff', 3, 'EMP-005', TRUE),
+  (6, 'Accountant', 'accounting@vikingsgrill.example', '09170000006', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', 'accounting_staff', 3, 'EMP-006', TRUE),
+  (7, 'Juan Dela Cruz', 'juan@example.ph', '09181234567', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', 'customer', 4, NULL, TRUE),
+  (8, 'Maria Clara', 'maria@example.ph', '09199876543', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', '$2b$10$KBx1aurQnrsI5XPqHoiokeiGdD/Bk/xxotj5bG0OEJDlfXh1p.U8K', 'customer', 4, NULL, TRUE) AS new
 ON DUPLICATE KEY UPDATE name = new.name, phone = new.phone, password = new.password, password_hash = new.password_hash, role = new.role, role_id = new.role_id;
 
 -- 6. Customer Profiles
