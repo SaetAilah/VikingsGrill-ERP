@@ -42,7 +42,27 @@ export default function UnifiedAuthPage() {
   // Subtle Demo Autofill Dropdown
   const [showDemoMenu, setShowDemoMenu] = useState(false);
 
-  const redirectAfterLogin = (user) => {
+  const redirectAfterLogin = async (user) => {
+    const params = new URLSearchParams(window.location.search);
+    const redirectTarget = params.get('redirect');
+
+    if (redirectTarget === 'jewel' || redirectTarget === 'accounting' || redirectTarget === 'payroll') {
+      try {
+        const targetType = redirectTarget === 'payroll' || user?.role === 'hr_staff' ? 'payroll' : 'accounting';
+        const res = await authApi.getSsoToken(targetType);
+        if (res?.url) {
+          let destUrl = res.url;
+          if (user?.role === 'hr_staff') {
+            destUrl = destUrl.replace('/hr/payroll', '/hr/dashboard');
+          }
+          window.location.href = destUrl;
+          return;
+        }
+      } catch (e) {
+        console.warn('SSO redirect failed, fallback to local routing:', e);
+      }
+    }
+
     if (user?.role === 'customer') {
       navigate('/customer', { replace: true });
     } else if (user?.role === 'cashier') {
@@ -54,6 +74,18 @@ export default function UnifiedAuthPage() {
     } else if (user?.role === 'accounting_staff') {
       // Accounting & Finance Staff land on POS Sales Reconciliation & Audit
       navigate('/pos/transactions', { replace: true });
+    } else if (user?.role === 'hr_staff') {
+      try {
+        const res = await authApi.getSsoToken('payroll');
+        if (res?.url) {
+          window.location.href = res.url.replace('/hr/payroll', '/hr/dashboard');
+          return;
+        }
+      } catch {
+        window.location.href = 'http://localhost:5177/hr/dashboard';
+        return;
+      }
+      window.location.href = 'http://localhost:5177/hr/dashboard';
     } else {
       const from = location.state?.from?.pathname || '/pos/orders';
       navigate(from, { replace: true });
