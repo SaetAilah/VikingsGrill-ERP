@@ -1,15 +1,16 @@
 import { Router } from 'express';
 import { getOrders, createOrder, receiveOrder } from '../controllers/procurementController.js';
 import { authenticate } from '../middleware/authMiddleware.js';
-import { requireManagerOrOwner } from '../middleware/roleMiddleware.js';
+import { requireAccountingOrManagement, requireManagerOrOwner } from '../middleware/roleMiddleware.js';
 
 const router = Router();
 
-router.use(authenticate, requireManagerOrOwner);
+router.use(authenticate);
 
-router.get('/orders', getOrders);
-router.post('/orders', createOrder);
-router.post('/orders/:orderNo/receive', receiveOrder);
+// Viewing orders requires Accounting or Management
+router.get('/orders', requireAccountingOrManagement, getOrders);
+router.post('/orders', requireManagerOrOwner, createOrder);
+router.post('/orders/:orderNo/receive', requireManagerOrOwner, receiveOrder);
 
 export default router;
 

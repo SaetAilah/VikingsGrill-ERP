@@ -29,6 +29,7 @@ import {
 export default function Sidebar() {
   const { user, logout, isOwner, isManager } = useAuth();
   const isInventoryStaff = user?.role === 'kitchen_staff' || user?.role === 'inventory_staff';
+  const isAccounting = user?.role === 'accounting_staff';
 
   const initials = user?.name
     ? user.name
@@ -53,6 +54,21 @@ export default function Sidebar() {
     window.location.href = 'http://localhost:5176';
   };
 
+  const handleOpenJewel = async (e, target) => {
+    e.preventDefault();
+    try {
+      const res = await authApi.getSsoToken(target);
+      if (res?.url) {
+        window.location.href = res.url;
+        return;
+      }
+    } catch (err) {
+      console.warn('SSO token acquisition failed, fallback to direct url:', err);
+    }
+    const path = target === 'payroll' ? '/hr/payroll' : '/accounting/dashboard';
+    window.location.href = `http://localhost:5177${path}`;
+  };
+
   return (
     <aside className="unified-sidebar">
       <div>
@@ -67,8 +83,65 @@ export default function Sidebar() {
         </div>
 
         <div className="sidebar-scroll">
-          {/* POS Navigation (Hidden from Kitchen Staff) */}
-          {(!isInventoryStaff || isOwner || isManager) && (
+          {/* ─── ACCOUNTING & FINANCE NAVIGATION ─── */}
+          {isAccounting && (
+            <>
+              <div className="nav-section-title">Accounting & Finance</div>
+              <a
+                href="http://localhost:5177/accounting/dashboard"
+                onClick={(e) => handleOpenJewel(e, 'accounting')}
+                className="nav-link"
+                style={{ opacity: 0.95, cursor: 'pointer', color: '#f87171' }}
+                title="Open Primary Accounting Dashboard & Financial Statements"
+              >
+                <DollarSign size={16} />
+                <span>Accounting Dashboard</span>
+                <ArrowRight size={13} style={{ marginLeft: 'auto', opacity: 0.7 }} />
+              </a>
+              <a
+                href="http://localhost:5177/hr/payroll"
+                onClick={(e) => handleOpenJewel(e, 'payroll')}
+                className="nav-link"
+                style={{ opacity: 0.95, cursor: 'pointer', color: '#f87171' }}
+                title="Reconcile Staff Payroll Releases & Deductions"
+              >
+                <Users size={16} />
+                <span>Payroll & Deductions</span>
+                <ArrowRight size={13} style={{ marginLeft: 'auto', opacity: 0.7 }} />
+              </a>
+
+              <div className="nav-section-title">POS Reconciliation</div>
+              <NavLink to="/pos/transactions" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <History size={16} />
+                <span>Transaction History</span>
+              </NavLink>
+              <NavLink to="/pos/sales-reports" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <TrendingUp size={16} />
+                <span>Sales Reports</span>
+              </NavLink>
+
+              <div className="nav-section-title">Expense & Procurement Audit</div>
+              <NavLink to="/inventory/procurement" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <FileCheck size={16} />
+                <span>Purchase Orders</span>
+              </NavLink>
+              <NavLink to="/inventory/suppliers" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <Truck size={16} />
+                <span>Suppliers</span>
+              </NavLink>
+              <NavLink to="/inventory/reports" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <FileSpreadsheet size={16} />
+                <span>Inventory Reports</span>
+              </NavLink>
+              <NavLink to="/inventory/movements" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <ArrowLeftRight size={16} />
+                <span>Stock Movements</span>
+              </NavLink>
+            </>
+          )}
+
+          {/* ─── POS NAVIGATION (Hidden from Kitchen & Accounting Staff) ─── */}
+          {!isInventoryStaff && !isAccounting && (
             <>
               <div className="nav-section-title">Front of House (POS)</div>
               {(isOwner || isManager) && (
@@ -104,8 +177,8 @@ export default function Sidebar() {
             </>
           )}
 
-          {/* Inventory Navigation */}
-          {(isOwner || isManager || isInventoryStaff) && (
+          {/* ─── INVENTORY NAVIGATION (Kitchen Staff, Owner, Manager) ─── */}
+          {!isAccounting && (isOwner || isManager || isInventoryStaff) && (
             <>
               <div className="nav-section-title">
                 {isInventoryStaff && !isOwner ? 'Kitchen Inventory' : 'Stockroom & Procurement'}
@@ -175,8 +248,8 @@ export default function Sidebar() {
             </>
           )}
 
-          {/* VikingsERP Ecosystem Links */}
-          {(!isInventoryStaff || isOwner || isManager) && (
+          {/* ─── VIKINGSERP ECOSYSTEM INTEGRATIONS ─── */}
+          {!isAccounting && (!isInventoryStaff || isOwner || isManager) && (
             <>
               <div className="nav-section-title">VikingsERP Integrated Modules</div>
               <a

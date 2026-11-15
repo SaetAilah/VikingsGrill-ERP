@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout.jsx';
+import { useAuth } from './context/AuthContext.jsx';
 import { PosProvider } from './context/PosContext.jsx';
 import { InventoryProvider } from './context/InventoryContext.jsx';
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
@@ -31,6 +32,17 @@ import InventoryReports from './pages/inventory/InventoryReports.jsx';
 // Administration
 import TeamManagement from './pages/TeamManagement.jsx';
 
+function RoleDefaultRedirect() {
+  const { user } = useAuth();
+  if (user?.role === 'kitchen_staff' || user?.role === 'inventory_staff') {
+    return <Navigate to="/inventory/stock-levels" replace />;
+  }
+  if (user?.role === 'accounting_staff') {
+    return <Navigate to="/pos/transactions" replace />;
+  }
+  return <Navigate to="/pos/orders" replace />;
+}
+
 export default function App() {
   return (
     <PosProvider>
@@ -57,7 +69,7 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            <Route path="/" element={<Navigate to="/pos/orders" replace />} />
+            <Route path="/" element={<RoleDefaultRedirect />} />
 
             {/* Front of House (POS) Routes */}
             <Route path="/pos/dashboard" element={<POSDashboard />} />
@@ -82,7 +94,7 @@ export default function App() {
             <Route path="/team" element={<TeamManagement />} />
 
             {/* Fallback */}
-            <Route path="*" element={<Navigate to="/pos/orders" replace />} />
+            <Route path="*" element={<RoleDefaultRedirect />} />
           </Route>
         </Routes>
       </InventoryProvider>

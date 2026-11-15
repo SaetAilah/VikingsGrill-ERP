@@ -147,6 +147,29 @@ export const getSsoToken = async (req, res, next) => {
     const user = req.user;
     if (!user) return res.status(401).json({ error: 'Unauthenticated.' });
 
+    const target = req.query.target || 'reservation';
+
+    if (target === 'accounting' || target === 'payroll' || target === 'jewel') {
+      const jewelSecret = process.env.JEWEL_JWT_SECRET || 'viking_grill_jewel_jwt_secret_2026';
+      const jewelToken = jwt.sign(
+        {
+          id: user.id,
+          name: user.name || user.full_name,
+          email: user.email,
+          role: user.role,
+          employeeId: user.employee_id || user.id,
+        },
+        jewelSecret,
+        { expiresIn: '8h' },
+      );
+
+      const path = target === 'payroll' ? '/hr/payroll' : '/accounting/dashboard';
+      return res.json({
+        token: jewelToken,
+        url: `http://localhost:5177${path}?token=${encodeURIComponent(jewelToken)}`,
+      });
+    }
+
     const ssoToken = jwt.sign(
       {
         id: user.id,

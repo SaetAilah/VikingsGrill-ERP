@@ -6,13 +6,32 @@ export const requireRole = (...allowedRoles) => (req, res, next) => {
 };
 
 export const requireOwner = requireRole('Owner');
-export const requireManagerOrOwner = requireRole('Owner', 'Manager');
-export const requireStaffOrAbove = requireRole('Owner', 'Manager', 'Staff');
+export const requireManagerOrOwner = requireRole('Owner', 'Manager', 'management', 'administrator');
+export const requireAccountingOrManagement = requireRole(
+  'Owner',
+  'Manager',
+  'management',
+  'administrator',
+  'accounting_staff'
+);
+export const requireStaffOrAbove = requireRole(
+  'Owner',
+  'Manager',
+  'Staff',
+  'management',
+  'administrator',
+  'cashier',
+  'kitchen_staff',
+  'inventory_staff',
+  'hr_staff',
+  'accounting_staff'
+);
 
 export default {
   requireRole,
   requireOwner,
   requireManagerOrOwner,
+  requireAccountingOrManagement,
   requireStaffOrAbove,
 };
 

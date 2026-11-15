@@ -51,6 +51,9 @@ export default function UnifiedAuthPage() {
     } else if (user?.role === 'kitchen_staff' || user?.role === 'inventory_staff') {
       // Kitchen & Inventory Staff land on Kitchen Stock Levels
       navigate('/inventory/stock-levels', { replace: true });
+    } else if (user?.role === 'accounting_staff') {
+      // Accounting & Finance Staff land on POS Sales Reconciliation & Audit
+      navigate('/pos/transactions', { replace: true });
     } else {
       const from = location.state?.from?.pathname || '/pos/orders';
       navigate(from, { replace: true });
