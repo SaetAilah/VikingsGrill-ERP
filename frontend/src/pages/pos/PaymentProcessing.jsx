@@ -5,7 +5,7 @@ import { ArrowLeft, Check, CreditCard, Banknote, Smartphone, CheckCircle } from 
 
 export default function PaymentProcessing() {
   const navigate = useNavigate();
-  const { cart, total, paymentMethod, setPaymentMethod, amountTendered, setAmountTendered, checkout } = usePos();
+  const { cart, total, paymentMethod, setPaymentMethod, amountTendered, setAmountTendered, checkout, activeTable } = usePos();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
@@ -182,6 +182,12 @@ export default function PaymentProcessing() {
           Summary
         </h2>
 
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px', color: '#888' }}>
+          <span>Table / Location</span>
+          <span style={{ color: '#fff', fontWeight: 600 }}>
+            {activeTable?.table_number ? `${activeTable.table_number} (${activeTable.area.toUpperCase()})` : (activeTable || 'Walk-in / Takeout')}
+          </span>
+        </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '13px', color: '#888' }}>
           <span>Items in Ticket</span>
           <span>{cart.reduce((s, i) => s + i.quantity, 0)}</span>

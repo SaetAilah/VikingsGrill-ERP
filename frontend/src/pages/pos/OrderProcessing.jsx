@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePos } from '../../context/PosContext.jsx';
-import { Plus, Minus, Trash2, ArrowRight, Search, ShoppingBag } from 'lucide-react';
+import { Plus, Minus, Trash2, ArrowRight, Search, ShoppingBag, MapPin, AlertTriangle } from 'lucide-react';
 
 export default function OrderProcessing() {
   const navigate = useNavigate();
-  const { menu, cart, addToCart, changeQuantity, clearCart, total } = usePos();
+  const { menu, cart, addToCart, changeQuantity, clearCart, total, tables, activeTable, setActiveTable } = usePos();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -116,23 +116,85 @@ export default function OrderProcessing() {
 
       {/* Right Column: Active Order / Cart */}
       <div style={{ background: '#131313', border: '1px solid #222', borderRadius: '12px', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid #222', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h2 style={{ fontSize: '16px', margin: 0, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <ShoppingBag size={18} color="#ef4444" />
-              <span>Current Order</span>
-            </h2>
-            <small style={{ color: '#888', fontSize: '11px' }}>Table: Walk-in</small>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid #222' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <div>
+              <h2 style={{ fontSize: '16px', margin: 0, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ShoppingBag size={18} color="#ef4444" />
+                <span>Current Order Ticket</span>
+              </h2>
+            </div>
+            {cart.length > 0 && (
+              <button
+                onClick={clearCart}
+                style={{ background: 'transparent', border: 'none', color: '#666', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}
+              >
+                <Trash2 size={13} />
+                <span>Clear</span>
+              </button>
+            )}
           </div>
-          {cart.length > 0 && (
-            <button
-              onClick={clearCart}
-              style={{ background: 'transparent', border: 'none', color: '#666', cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}
+
+          {/* Table / Dining Area Selector */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+              <label style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.8px', color: '#888', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <MapPin size={12} color="#ef4444" />
+                <span>Table / Floor Location:</span>
+              </label>
+              <button
+                onClick={() => navigate('/pos/tables')}
+                style={{ background: 'none', border: 'none', color: '#dc2626', fontSize: '11px', cursor: 'pointer', textDecoration: 'underline' }}
+              >
+                View Floor Plan ↗
+              </button>
+            </div>
+            <select
+              value={activeTable?.id || (typeof activeTable === 'string' ? activeTable : '')}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (!val || val === 'Walk-in') {
+                  setActiveTable('Walk-in');
+                } else {
+                  const found = tables.find((t) => t.id === Number(val));
+                  setActiveTable(found || val);
+                }
+              }}
+              style={{
+                width: '100%',
+                padding: '8px 10px',
+                background: '#1a1a1a',
+                border: '1px solid #333',
+                borderRadius: '6px',
+                color: '#fff',
+                fontSize: '12px',
+                fontWeight: 600,
+                outline: 'none',
+              }}
             >
-              <Trash2 size={13} />
-              <span>Clear</span>
-            </button>
-          )}
+              <option value="Walk-in">Takeout / Walk-in Register</option>
+              {tables.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.table_number} ({t.area.toUpperCase()} · {t.capacity} pax) — {t.status.toUpperCase()}
+                  {t.reserved_by ? ` (Reserved: ${t.reserved_by})` : ''}
+                </option>
+              ))}
+            </select>
+
+            {/* Warning if occupied or reserved */}
+            {activeTable?.status === 'occupied' && (
+              <div style={{ marginTop: '8px', padding: '6px 10px', background: '#3b0d0d', border: '1px solid #7f1d1d', borderRadius: '4px', fontSize: '11px', color: '#fca5a5', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <AlertTriangle size={13} />
+                <span>Table {activeTable.table_number} is occupied. Items will be billed to this table.</span>
+              </div>
+            )}
+            {activeTable?.status === 'reserved' && (
+              <div style={{ marginTop: '8px', padding: '6px 10px', background: '#3b2005', border: '1px solid #92400e', borderRadius: '4px', fontSize: '11px', color: '#fde68a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <AlertTriangle size={13} />
+                <span>Table {activeTable.table_number} reserved for {activeTable.reserved_by || 'customer'}.</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Cart Item Lines */}

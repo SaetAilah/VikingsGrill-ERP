@@ -124,16 +124,16 @@ export default function MenuManagement() {
       </div>
 
       {/* Menu Table */}
-      <div className="surface" style={{ borderRadius: '10px', overflow: 'hidden' }}>
+      <div style={{ background: '#141414', border: '1px solid #242424', borderRadius: '10px', overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
           <thead>
-            <tr style={{ background: '#121212', borderBottom: '1px solid #222', textAlign: 'left', color: '#666', fontSize: '11px' }}>
-              <th style={{ padding: '12px 16px' }}>CODE</th>
-              <th style={{ padding: '12px 16px' }}>DISH NAME</th>
-              <th style={{ padding: '12px 16px' }}>CATEGORY</th>
-              <th style={{ padding: '12px 16px' }}>PRICE</th>
-              <th style={{ padding: '12px 16px' }}>STATUS</th>
-              <th style={{ padding: '12px 16px', textAlign: 'right' }}>ACTIONS</th>
+            <tr style={{ background: '#0e0e0e', borderBottom: '1px solid #242424', textAlign: 'left', color: '#888', fontSize: '11px' }}>
+              <th style={{ padding: '14px 16px' }}>CODE</th>
+              <th style={{ padding: '14px 16px' }}>DISH NAME</th>
+              <th style={{ padding: '14px 16px' }}>CATEGORY</th>
+              <th style={{ padding: '14px 16px' }}>PRICE</th>
+              <th style={{ padding: '14px 16px' }}>STATUS</th>
+              <th style={{ padding: '14px 16px', textAlign: 'right' }}>ACTIONS</th>
             </tr>
           </thead>
           <tbody>

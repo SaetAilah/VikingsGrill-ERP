@@ -6,6 +6,29 @@
 @import './styles/inventory-pages.css';
 @import './styles/inventory-report.css';
 
+/* Dark Theme Surface Normalizer to prevent legacy white surfaces */
+.surface, .metric-card, .table-surface {
+  background: #141414 !important;
+  border: 1px solid #242424 !important;
+  color: #f0f0f0 !important;
+}
+
+.surface table, .table-surface table {
+  background: transparent !important;
+  color: #f0f0f0 !important;
+}
+
+.surface table th, .table-surface table th {
+  color: #888888 !important;
+  background: #101010 !important;
+  border-bottom: 1px solid #242424 !important;
+}
+
+.surface table td, .table-surface table td {
+  border-bottom: 1px solid #1c1c1c !important;
+  color: #e5e5e5 !important;
+}
+
 :root {
   --color-primary: #8b0000;
   --color-primary-hover: #a10d0d;

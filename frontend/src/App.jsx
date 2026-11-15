@@ -12,6 +12,7 @@ import CustomerPortal from './pages/CustomerPortal.jsx';
 // POS Pages
 import POSDashboard from './pages/pos/POSDashboard.jsx';
 import OrderProcessing from './pages/pos/OrderProcessing.jsx';
+import TableFloorPlan from './pages/pos/TableFloorPlan.jsx';
 import PaymentProcessing from './pages/pos/PaymentProcessing.jsx';
 import ReceiptScreen from './pages/pos/ReceiptScreen.jsx';
 import TransactionHistory from './pages/pos/TransactionHistory.jsx';
@@ -62,6 +63,7 @@ export default function App() {
             {/* Front of House (POS) Routes */}
             <Route path="/pos/dashboard" element={<POSDashboard />} />
             <Route path="/pos/orders" element={<OrderProcessing />} />
+            <Route path="/pos/tables" element={<TableFloorPlan />} />
             <Route path="/pos/payment" element={<PaymentProcessing />} />
             <Route path="/pos/receipt" element={<ReceiptScreen />} />
             <Route path="/pos/transactions" element={<TransactionHistory />} />

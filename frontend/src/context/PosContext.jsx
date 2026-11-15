@@ -20,6 +20,8 @@ export function PosProvider({ children }) {
     return saved ? JSON.parse(saved) : DEFAULT_MENU;
   });
   const [sales, setSales] = useState([]);
+  const [tables, setTables] = useState([]);
+  const [activeTable, setActiveTable] = useState(null);
   const [cart, setCart] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [amountTendered, setAmountTendered] = useState('');
@@ -47,12 +49,23 @@ export function PosProvider({ children }) {
     }
   };
 
+  const refreshTables = async () => {
+    try {
+      const data = await posApi.getTables();
+      if (Array.isArray(data)) setTables(data);
+    } catch {
+      // Fallback
+    }
+  };
+
   useEffect(() => {
     refreshMenu();
     refreshSales();
+    refreshTables();
     const timer = setInterval(() => {
       refreshMenu();
       refreshSales();
+      refreshTables();
     }, 15000);
     return () => clearInterval(timer);
   }, []);
@@ -86,10 +99,15 @@ export function PosProvider({ children }) {
     if (!cart.length) throw new Error('Cart is empty.');
     const paid = Number(amountTendered || total);
 
+    const tableName = activeTable?.table_number || (typeof activeTable === 'string' ? activeTable : 'Walk-in');
+    const tableId = activeTable?.id || null;
+
     const payload = {
       items: cart.map((i) => ({ menuItemId: i.id, quantity: i.quantity })),
       paymentMethod,
       amountTendered: paid,
+      tableName,
+      tableId,
     };
 
     let receiptId = `VG-${Date.now().toString().slice(-6)}`;
@@ -109,13 +127,16 @@ export function PosProvider({ children }) {
       method: paymentMethod,
       amountTendered: paid,
       change: Math.max(0, paid - total),
-      table: 'Walk-in',
+      table: tableName,
+      tableId,
     };
 
     setLastReceipt(receipt);
     setSales((prev) => [receipt, ...prev]);
     clearCart();
     setAmountTendered('');
+    setActiveTable(null);
+    refreshTables();
     return receipt;
   };
 
@@ -124,6 +145,10 @@ export function PosProvider({ children }) {
     refreshMenu,
     sales,
     refreshSales,
+    tables,
+    refreshTables,
+    activeTable,
+    setActiveTable,
     cart,
     addToCart,
     changeQuantity,

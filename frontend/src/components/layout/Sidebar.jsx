@@ -22,10 +22,12 @@ import {
   Calendar,
   DollarSign,
   Star,
+  LayoutGrid,
 } from 'lucide-react';
 
 export default function Sidebar() {
   const { user, logout, isOwner, isManager } = useAuth();
+  const isInventoryStaff = user?.role === 'kitchen_staff' || user?.role === 'inventory_staff';
 
   const initials = user?.name
     ? user.name
@@ -62,6 +64,10 @@ export default function Sidebar() {
             <ShoppingCart size={16} />
             <span>Order Processing</span>
           </NavLink>
+          <NavLink to="/pos/tables" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            <LayoutGrid size={16} />
+            <span>Table Seating (Module B)</span>
+          </NavLink>
           <NavLink to="/pos/payment" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <CreditCard size={16} />
             <span>Payment Processing</span>
@@ -80,53 +86,57 @@ export default function Sidebar() {
                 <TrendingUp size={16} />
                 <span>Sales Reports</span>
               </NavLink>
+              <NavLink to="/pos/menu" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <UtensilsCrossed size={16} />
+                <span>Menu Management</span>
+              </NavLink>
             </>
           )}
-          <NavLink to="/pos/menu" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <UtensilsCrossed size={16} />
-            <span>Menu Management</span>
-          </NavLink>
 
-          {/* Inventory Navigation */}
-          <div className="nav-section-title">Stockroom & Procurement</div>
-          {(isOwner || isManager) && (
-            <NavLink to="/inventory/dashboard" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              <Boxes size={16} />
-              <span>Inventory Dashboard</span>
-            </NavLink>
-          )}
-          <NavLink to="/inventory/items" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <Package size={16} />
-            <span>Inventory Items</span>
-          </NavLink>
-          <NavLink to="/inventory/stock-levels" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <Boxes size={16} />
-            <span>Stock Levels</span>
-          </NavLink>
-          <NavLink to="/inventory/movements" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <ArrowLeftRight size={16} />
-            <span>Stock Movements</span>
-          </NavLink>
-          {(isOwner || isManager) && (
+          {/* Inventory Navigation (Restricted to Management & Kitchen/Inventory Staff) */}
+          {(isOwner || isManager || isInventoryStaff) && (
             <>
-              <NavLink to="/inventory/suppliers" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                <Truck size={16} />
-                <span>Suppliers</span>
+              <div className="nav-section-title">Stockroom & Procurement</div>
+              {(isOwner || isManager) && (
+                <NavLink to="/inventory/dashboard" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                  <Boxes size={16} />
+                  <span>Inventory Dashboard</span>
+                </NavLink>
+              )}
+              <NavLink to="/inventory/items" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <Package size={16} />
+                <span>Inventory Items</span>
               </NavLink>
-              <NavLink to="/inventory/procurement" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                <FileCheck size={16} />
-                <span>Purchase Orders</span>
+              <NavLink to="/inventory/stock-levels" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <Boxes size={16} />
+                <span>Stock Levels</span>
               </NavLink>
-              <NavLink to="/inventory/reports" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                <FileSpreadsheet size={16} />
-                <span>Inventory Reports</span>
+              <NavLink to="/inventory/movements" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <ArrowLeftRight size={16} />
+                <span>Stock Movements</span>
+              </NavLink>
+              {(isOwner || isManager) && (
+                <>
+                  <NavLink to="/inventory/suppliers" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                    <Truck size={16} />
+                    <span>Suppliers</span>
+                  </NavLink>
+                  <NavLink to="/inventory/procurement" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                    <FileCheck size={16} />
+                    <span>Purchase Orders</span>
+                  </NavLink>
+                  <NavLink to="/inventory/reports" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                    <FileSpreadsheet size={16} />
+                    <span>Inventory Reports</span>
+                  </NavLink>
+                </>
+              )}
+              <NavLink to="/inventory/alerts" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <AlertTriangle size={16} />
+                <span>Low-Stock Alerts</span>
               </NavLink>
             </>
           )}
-          <NavLink to="/inventory/alerts" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <AlertTriangle size={16} />
-            <span>Low-Stock Alerts</span>
-          </NavLink>
 
           {/* VikingsERP Ecosystem Links */}
           <div className="nav-section-title">VikingsERP Integrated Modules</div>

@@ -20,7 +20,7 @@ export const getSales = async (_req, res, next) => {
 };
 
 export const createSale = async (req, res, next) => {
-  const { items, paymentMethod, amountTendered } = req.body || {};
+  const { items, paymentMethod, amountTendered, tableName, tableId } = req.body || {};
 
   if (
     !Array.isArray(items) ||
@@ -63,12 +63,20 @@ export const createSale = async (req, res, next) => {
       throw Object.assign(new Error('Amount tendered must cover the order total.'), { statusCode: 400 });
     }
 
+    const assignedTable = tableName ? String(tableName).trim() : 'Walk-in';
     const receiptNo = `VG-${Date.now()}`;
     const [saleResult] = await connection.query(
       `INSERT INTO sales (receipt_no, order_type, subtotal, tax_amount, total_amount, status)
-       VALUES (?, 'Walk-in', ?, 0, ?, 'Completed')`,
-      [receiptNo, subtotal, subtotal],
+       VALUES (?, ?, ?, 0, ?, 'Completed')`,
+      [receiptNo, assignedTable, subtotal, subtotal],
     );
+
+    if (tableId) {
+      await connection.query(
+        'UPDATE restaurant_tables SET status = ? WHERE id = ?',
+        ['occupied', tableId],
+      );
+    }
 
     for (const line of lines) {
       await connection.query(

@@ -30,6 +30,16 @@ export const posApi = {
     const res = await api.post('/sales', data);
     return res.data;
   },
+
+  async getTables() {
+    const res = await api.get('/tables');
+    return res.data;
+  },
+
+  async updateTableStatus(id, status) {
+    const res = await api.patch(`/tables/${id}/status`, { status });
+    return res.data;
+  },
 };
 
 export default posApi;

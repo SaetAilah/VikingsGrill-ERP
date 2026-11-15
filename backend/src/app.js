@@ -11,6 +11,7 @@ import salesRoutes from './routes/salesRoutes.js';
 import inventoryRoutes from './routes/inventoryRoutes.js';
 import supplierRoutes from './routes/supplierRoutes.js';
 import procurementRoutes from './routes/procurementRoutes.js';
+import tableRoutes from './routes/tableRoutes.js';
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use('/api/sales', salesRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/procurement', procurementRoutes);
+app.use('/api/tables', tableRoutes);
 
 // Central Error Middleware
 app.use(errorMiddleware);

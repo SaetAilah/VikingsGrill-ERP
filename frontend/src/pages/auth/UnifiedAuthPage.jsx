@@ -45,6 +45,9 @@ export default function UnifiedAuthPage() {
   const redirectAfterLogin = (user) => {
     if (user?.role === 'customer') {
       navigate('/customer', { replace: true });
+    } else if (user?.role === 'cashier') {
+      // Cashiers always land directly on Front-of-House Order Processing
+      navigate('/pos/orders', { replace: true });
     } else {
       const from = location.state?.from?.pathname || '/pos/orders';
       navigate(from, { replace: true });
