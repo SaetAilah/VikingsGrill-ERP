@@ -22,6 +22,11 @@ export const authApi = {
     return res.data;
   },
 
+  async getSsoToken() {
+    const res = await api.get('/auth/sso-token');
+    return res.data;
+  },
+
   async logout() {
     try {
       await api.post('/auth/logout');

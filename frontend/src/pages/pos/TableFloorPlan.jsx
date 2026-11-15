@@ -100,7 +100,7 @@ export default function TableFloorPlan() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
             <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '1px', color: '#dc2626', fontWeight: 700 }}>
-              Module B · Floor Operations
+              Floor Operations
             </span>
             <span style={{ color: '#444' }}>•</span>
             <span style={{ fontSize: '11px', color: '#888' }}>Live Dining Floor Plan</span>

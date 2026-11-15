@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
+import authApi from '../../services/authApi.js';
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -38,6 +39,20 @@ export default function Sidebar() {
         .toUpperCase()
     : 'VG';
 
+  const handleOpenReservation = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await authApi.getSsoToken();
+      if (res?.url) {
+        window.open(res.url, '_blank');
+        return;
+      }
+    } catch (err) {
+      console.warn('SSO token acquisition failed, fallback to direct url:', err);
+    }
+    window.open('http://localhost:5176', '_blank');
+  };
+
   return (
     <aside className="unified-sidebar">
       <div>
@@ -66,7 +81,7 @@ export default function Sidebar() {
           </NavLink>
           <NavLink to="/pos/tables" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <LayoutGrid size={16} />
-            <span>Table Seating (Module B)</span>
+            <span>Table Seating</span>
           </NavLink>
           <NavLink to="/pos/payment" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <CreditCard size={16} />
@@ -142,48 +157,53 @@ export default function Sidebar() {
           <div className="nav-section-title">VikingsERP Integrated Modules</div>
           <a
             href="http://localhost:5176"
-            target="_blank"
-            rel="noreferrer"
+            onClick={handleOpenReservation}
             className="nav-link"
-            style={{ opacity: 0.9 }}
+            style={{ opacity: 0.9, cursor: 'pointer' }}
+            title="Single Sign-On into Reservation & Queue"
           >
             <Calendar size={16} />
             <span>Reservation & Queue</span>
             <ExternalLink size={12} style={{ marginLeft: 'auto' }} />
           </a>
-          <a
-            href="http://localhost:5177"
-            target="_blank"
-            rel="noreferrer"
-            className="nav-link"
-            style={{ opacity: 0.9 }}
-          >
-            <DollarSign size={16} />
-            <span>HR & Accounting</span>
-            <ExternalLink size={12} style={{ marginLeft: 'auto' }} />
-          </a>
-          <a
-            href="http://localhost:5178"
-            target="_blank"
-            rel="noreferrer"
-            className="nav-link"
-            style={{ opacity: 0.9 }}
-          >
-            <Star size={16} />
-            <span>Customer Feedback</span>
-            <ExternalLink size={12} style={{ marginLeft: 'auto' }} />
-          </a>
-          <a
-            href="http://localhost:5175"
-            target="_blank"
-            rel="noreferrer"
-            className="nav-link"
-            style={{ opacity: 0.9 }}
-          >
-            <TrendingUp size={16} />
-            <span>Reporting & KPI Suite</span>
-            <ExternalLink size={12} style={{ marginLeft: 'auto' }} />
-          </a>
+
+          {(isOwner || isManager) && (
+            <>
+              <a
+                href="http://localhost:5177"
+                target="_blank"
+                rel="noreferrer"
+                className="nav-link"
+                style={{ opacity: 0.9 }}
+              >
+                <DollarSign size={16} />
+                <span>HR & Accounting</span>
+                <ExternalLink size={12} style={{ marginLeft: 'auto' }} />
+              </a>
+              <a
+                href="http://localhost:5178"
+                target="_blank"
+                rel="noreferrer"
+                className="nav-link"
+                style={{ opacity: 0.9 }}
+              >
+                <Star size={16} />
+                <span>Customer Feedback</span>
+                <ExternalLink size={12} style={{ marginLeft: 'auto' }} />
+              </a>
+              <a
+                href="http://localhost:5175"
+                target="_blank"
+                rel="noreferrer"
+                className="nav-link"
+                style={{ opacity: 0.9 }}
+              >
+                <TrendingUp size={16} />
+                <span>Reporting & KPI Suite</span>
+                <ExternalLink size={12} style={{ marginLeft: 'auto' }} />
+              </a>
+            </>
+          )}
 
           {/* Administration (Owner only) */}
           {isOwner && (

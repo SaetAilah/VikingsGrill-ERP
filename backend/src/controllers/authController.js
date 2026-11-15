@@ -1,3 +1,5 @@
+import jwt from 'jsonwebtoken';
+import env from '../config/env.js';
 import pool from '../config/database.js';
 import {
   hashPassword,
@@ -135,6 +137,36 @@ export const logout = async (req, res, next) => {
   try {
     await pool.query('DELETE FROM auth_sessions WHERE token_hash = ?', [hashToken(token)]);
     res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getSsoToken = async (req, res, next) => {
+  try {
+    const user = req.user;
+    if (!user) return res.status(401).json({ error: 'Unauthenticated.' });
+
+    const ssoToken = jwt.sign(
+      {
+        id: user.id,
+        name: user.name || user.full_name,
+        email: user.email,
+        phone: user.phone || null,
+        role: user.role,
+      },
+      env.JWT_SECRET,
+      { expiresIn: '24h' },
+    );
+
+    let destinationPath = '/staff/reservations';
+    if (user.role === 'customer') destinationPath = '/menu';
+    else if (['Owner', 'Manager', 'management'].includes(user.role)) destinationPath = '/management/dashboard';
+
+    res.json({
+      token: ssoToken,
+      url: `http://localhost:5176${destinationPath}?token=${encodeURIComponent(ssoToken)}`,
+    });
   } catch (error) {
     next(error);
   }
