@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useAuth } from './AuthContext.jsx';
 import inventoryApi from '../services/inventoryApi.js';
 
 const InventoryContext = createContext(null);
@@ -22,6 +23,11 @@ const SEED_SUPPLIERS = [
 ];
 
 export function InventoryProvider({ children }) {
+  const { user } = useAuth();
+  const canViewProcurement = Boolean(
+    user && ['Owner', 'Manager', 'management', 'administrator', 'accounting_staff', 'inventory_staff'].includes(user.role)
+  );
+
   const [items, setItems] = useState(() => {
     const saved = localStorage.getItem('vikings-inv-items');
     return saved ? JSON.parse(saved) : SEED_ITEMS;
@@ -46,6 +52,10 @@ export function InventoryProvider({ children }) {
   };
 
   const refreshSuppliers = async () => {
+    if (!canViewProcurement) {
+      setSuppliers(SEED_SUPPLIERS);
+      return;
+    }
     try {
       const data = await inventoryApi.getSuppliers();
       if (Array.isArray(data)) setSuppliers(data);
@@ -64,6 +74,10 @@ export function InventoryProvider({ children }) {
   };
 
   const refreshOrders = async () => {
+    if (!canViewProcurement) {
+      setOrders([]);
+      return;
+    }
     try {
       const data = await inventoryApi.getOrders();
       if (Array.isArray(data)) setOrders(data);
@@ -74,17 +88,21 @@ export function InventoryProvider({ children }) {
 
   useEffect(() => {
     refreshItems();
-    refreshSuppliers();
     refreshMovements();
-    refreshOrders();
+    if (canViewProcurement) {
+      refreshSuppliers();
+      refreshOrders();
+    }
 
     const timer = setInterval(() => {
       refreshItems();
       refreshMovements();
-      refreshOrders();
+      if (canViewProcurement) {
+        refreshOrders();
+      }
     }, 15000);
     return () => clearInterval(timer);
-  }, []);
+  }, [canViewProcurement]);
 
   const lowStock = items.filter((item) => Number(item.quantity) <= Number(item.reorder));
 

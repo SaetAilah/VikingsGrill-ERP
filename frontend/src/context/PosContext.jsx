@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useAuth } from './AuthContext.jsx';
 import posApi from '../services/posApi.js';
 
 const PosContext = createContext(null);
@@ -15,6 +16,11 @@ const DEFAULT_MENU = [
 ];
 
 export function PosProvider({ children }) {
+  const { user } = useAuth();
+  const canViewSales = Boolean(
+    user && ['Owner', 'Manager', 'management', 'administrator', 'accounting_staff'].includes(user.role)
+  );
+
   const [menu, setMenu] = useState(() => {
     const saved = localStorage.getItem('vikings-pos-menu');
     return saved ? JSON.parse(saved) : DEFAULT_MENU;
@@ -41,6 +47,10 @@ export function PosProvider({ children }) {
   };
 
   const refreshSales = async () => {
+    if (!canViewSales) {
+      setSales([]);
+      return;
+    }
     try {
       const data = await posApi.getSales();
       if (Array.isArray(data)) setSales(data);
@@ -60,15 +70,15 @@ export function PosProvider({ children }) {
 
   useEffect(() => {
     refreshMenu();
-    refreshSales();
+    if (canViewSales) refreshSales();
     refreshTables();
     const timer = setInterval(() => {
       refreshMenu();
-      refreshSales();
+      if (canViewSales) refreshSales();
       refreshTables();
     }, 15000);
     return () => clearInterval(timer);
-  }, []);
+  }, [canViewSales]);
 
   const addToCart = (product) => {
     setCart((prev) => {

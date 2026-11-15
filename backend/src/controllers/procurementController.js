@@ -4,14 +4,14 @@ export const getOrders = async (_req, res, next) => {
   try {
     const [rows] = await pool.query(
       `SELECT p.order_no AS id, p.order_no AS orderNumber, s.name AS supplier, p.order_date AS date, p.status,
-              COUNT(pi.id) AS lines, SUM(pi.quantity * pi.unit_cost) AS amount
+              COUNT(pi.id) AS lineCount, SUM(pi.quantity * pi.unit_cost) AS amount
        FROM purchase_orders p
        JOIN suppliers s ON s.id = p.supplier_id
        LEFT JOIN purchase_order_items pi ON pi.purchase_order_id = p.id
-       GROUP BY p.id
+       GROUP BY p.id, p.order_no, s.name, p.order_date, p.status
        ORDER BY p.order_date DESC`,
     );
-    res.json(rows);
+    res.json(rows.map((r) => ({ ...r, lines: Number(r.lineCount || 1) })));
   } catch (error) {
     next(error);
   }
