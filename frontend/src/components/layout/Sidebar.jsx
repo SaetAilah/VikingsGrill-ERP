@@ -23,6 +23,7 @@ import {
   Calendar,
   DollarSign,
   Star,
+  ArrowRight,
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -43,13 +44,13 @@ export default function Sidebar() {
     try {
       const res = await authApi.getSsoToken();
       if (res?.url) {
-        window.open(res.url, '_blank');
+        window.location.href = res.url;
         return;
       }
     } catch (err) {
       console.warn('SSO token acquisition failed, fallback to direct url:', err);
     }
-    window.open('http://localhost:5176', '_blank');
+    window.location.href = 'http://localhost:5176';
   };
 
   return (
@@ -159,7 +160,7 @@ export default function Sidebar() {
           >
             <Calendar size={16} />
             <span>Reservation & Queue</span>
-            <ExternalLink size={12} style={{ marginLeft: 'auto' }} />
+            <ArrowRight size={13} style={{ marginLeft: 'auto', opacity: 0.7 }} />
           </a>
 
           {(isOwner || isManager) && (
