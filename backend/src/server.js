@@ -16,3 +16,4 @@ pool.query('SELECT 1')
 app.listen(port, () => {
   console.log(`[VikingsERP Unified Backend] listening on http://localhost:${port}`);
 });
+[]
