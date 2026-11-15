@@ -135,19 +135,13 @@ export default function OrderProcessing() {
             )}
           </div>
 
-          {/* Table / Dining Area Selector */}
+          {/* Table / Order Type Selector */}
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
               <label style={{ fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.8px', color: '#888', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <MapPin size={12} color="#ef4444" />
-                <span>Table / Floor Location:</span>
+                <span>Table / Order Type:</span>
               </label>
-              <button
-                onClick={() => navigate('/pos/tables')}
-                style={{ background: 'none', border: 'none', color: '#dc2626', fontSize: '11px', cursor: 'pointer', textDecoration: 'underline' }}
-              >
-                View Floor Plan ↗
-              </button>
             </div>
             <select
               value={activeTable?.id || (typeof activeTable === 'string' ? activeTable : '')}

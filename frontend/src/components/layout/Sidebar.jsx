@@ -23,7 +23,6 @@ import {
   Calendar,
   DollarSign,
   Star,
-  LayoutGrid,
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -78,10 +77,6 @@ export default function Sidebar() {
           <NavLink to="/pos/orders" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <ShoppingCart size={16} />
             <span>Order Processing</span>
-          </NavLink>
-          <NavLink to="/pos/tables" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <LayoutGrid size={16} />
-            <span>Table Seating</span>
           </NavLink>
           <NavLink to="/pos/payment" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             <CreditCard size={16} />
