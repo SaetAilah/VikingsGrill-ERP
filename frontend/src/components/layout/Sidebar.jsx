@@ -86,30 +86,6 @@ export default function Sidebar() {
           {/* ─── ACCOUNTING & FINANCE NAVIGATION ─── */}
           {isAccounting && (
             <>
-              <div className="nav-section-title">Accounting & Finance</div>
-              <a
-                href="http://localhost:5177/accounting/dashboard"
-                onClick={(e) => handleOpenJewel(e, 'accounting')}
-                className="nav-link"
-                style={{ opacity: 0.95, cursor: 'pointer', color: '#f87171' }}
-                title="Open Primary Accounting Dashboard & Financial Statements"
-              >
-                <DollarSign size={16} />
-                <span>Accounting Dashboard</span>
-                <ArrowRight size={13} style={{ marginLeft: 'auto', opacity: 0.7 }} />
-              </a>
-              <a
-                href="http://localhost:5177/hr/payroll"
-                onClick={(e) => handleOpenJewel(e, 'payroll')}
-                className="nav-link"
-                style={{ opacity: 0.95, cursor: 'pointer', color: '#f87171' }}
-                title="Reconcile Staff Payroll Releases & Deductions"
-              >
-                <Users size={16} />
-                <span>Payroll & Deductions</span>
-                <ArrowRight size={13} style={{ marginLeft: 'auto', opacity: 0.7 }} />
-              </a>
-
               <div className="nav-section-title">POS Reconciliation</div>
               <NavLink to="/pos/transactions" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
                 <History size={16} />
@@ -137,6 +113,30 @@ export default function Sidebar() {
                 <ArrowLeftRight size={16} />
                 <span>Stock Movements</span>
               </NavLink>
+
+              <div className="nav-section-title">Accounting & Finance</div>
+              <a
+                href="http://localhost:5177/accounting/dashboard"
+                onClick={(e) => handleOpenJewel(e, 'accounting')}
+                className="nav-link"
+                style={{ opacity: 0.95, cursor: 'pointer', color: '#f87171' }}
+                title="Open Primary Accounting Dashboard & Financial Statements"
+              >
+                <DollarSign size={16} />
+                <span>Accounting Dashboard</span>
+                <ArrowRight size={13} style={{ marginLeft: 'auto', opacity: 0.7 }} />
+              </a>
+              <a
+                href="http://localhost:5177/hr/payroll"
+                onClick={(e) => handleOpenJewel(e, 'payroll')}
+                className="nav-link"
+                style={{ opacity: 0.95, cursor: 'pointer', color: '#f87171' }}
+                title="Reconcile Staff Payroll Releases & Deductions"
+              >
+                <Users size={16} />
+                <span>Payroll & Deductions</span>
+                <ArrowRight size={13} style={{ marginLeft: 'auto', opacity: 0.7 }} />
+              </a>
             </>
           )}
 
