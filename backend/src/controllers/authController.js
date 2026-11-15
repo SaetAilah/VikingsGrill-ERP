@@ -170,6 +170,30 @@ export const getSsoToken = async (req, res, next) => {
       });
     }
 
+    if (target === 'feedback' || target === 'crm' || target === 'customer_feedback') {
+      const feedbackSecret = process.env.FEEDBACK_JWT_SECRET || 'vikings_secret_key';
+      const isCustomer = user.role === 'customer' || user.role === 'Customer';
+      const roleName = isCustomer ? 'Customer' : (user.role === 'Manager' ? 'Manager' : 'Owner');
+      const roleId = isCustomer ? 6 : (user.role === 'Manager' ? 2 : 1);
+      const feedbackToken = jwt.sign(
+        {
+          id: user.id,
+          name: user.name || user.full_name,
+          email: user.email,
+          role_id: roleId,
+          role: roleName,
+        },
+        feedbackSecret,
+        { expiresIn: '24h' },
+      );
+
+      const path = isCustomer ? '/feedback' : '/management/feedback';
+      return res.json({
+        token: feedbackToken,
+        url: `http://localhost:5178${path}?token=${encodeURIComponent(feedbackToken)}`,
+      });
+    }
+
     const ssoToken = jwt.sign(
       {
         id: user.id,

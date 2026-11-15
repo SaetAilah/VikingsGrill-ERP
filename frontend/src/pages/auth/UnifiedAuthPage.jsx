@@ -75,6 +75,18 @@ export default function UnifiedAuthPage() {
       }
     }
 
+    if (redirectTarget === 'feedback' || redirectTarget === 'crm' || redirectTarget === 'customer_feedback') {
+      try {
+        const res = await authApi.getSsoToken('feedback');
+        if (res?.url) {
+          window.location.href = res.url;
+          return;
+        }
+      } catch (e) {
+        console.warn('SSO redirect to feedback failed, fallback to local routing:', e);
+      }
+    }
+
     if (user?.role === 'customer') {
       navigate('/customer', { replace: true });
     } else if (user?.role === 'cashier') {
