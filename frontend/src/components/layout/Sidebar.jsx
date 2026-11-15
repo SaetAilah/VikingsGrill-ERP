@@ -67,64 +67,93 @@ export default function Sidebar() {
         </div>
 
         <div className="sidebar-scroll">
-          {/* POS Navigation */}
-          <div className="nav-section-title">Front of House (POS)</div>
-          {(isOwner || isManager) && (
-            <NavLink to="/pos/dashboard" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              <LayoutDashboard size={16} />
-              <span>POS Dashboard</span>
-            </NavLink>
-          )}
-          <NavLink to="/pos/orders" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <ShoppingCart size={16} />
-            <span>Order Processing</span>
-          </NavLink>
-          <NavLink to="/pos/payment" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <CreditCard size={16} />
-            <span>Payment Processing</span>
-          </NavLink>
-          <NavLink to="/pos/receipt" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-            <Receipt size={16} />
-            <span>Receipt Screen</span>
-          </NavLink>
-          {(isOwner || isManager) && (
+          {/* POS Navigation (Hidden from Kitchen Staff) */}
+          {(!isInventoryStaff || isOwner || isManager) && (
             <>
-              <NavLink to="/pos/transactions" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                <History size={16} />
-                <span>Transaction History</span>
+              <div className="nav-section-title">Front of House (POS)</div>
+              {(isOwner || isManager) && (
+                <NavLink to="/pos/dashboard" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                  <LayoutDashboard size={16} />
+                  <span>POS Dashboard</span>
+                </NavLink>
+              )}
+              <NavLink to="/pos/orders" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <ShoppingCart size={16} />
+                <span>Order Processing</span>
               </NavLink>
-              <NavLink to="/pos/sales-reports" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                <TrendingUp size={16} />
-                <span>Sales Reports</span>
+              <NavLink to="/pos/payment" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <CreditCard size={16} />
+                <span>Payment Processing</span>
               </NavLink>
-              <NavLink to="/pos/menu" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                <UtensilsCrossed size={16} />
-                <span>Menu Management</span>
+              <NavLink to="/pos/receipt" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <Receipt size={16} />
+                <span>Receipt Screen</span>
               </NavLink>
+              {(isOwner || isManager) && (
+                <>
+                  <NavLink to="/pos/transactions" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                    <History size={16} />
+                    <span>Transaction History</span>
+                  </NavLink>
+                  <NavLink to="/pos/sales-reports" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                    <TrendingUp size={16} />
+                    <span>Sales Reports</span>
+                  </NavLink>
+                </>
+              )}
             </>
           )}
 
-          {/* Inventory Navigation (Restricted to Management & Kitchen/Inventory Staff) */}
+          {/* Kitchen Orders & KOT (Module A - Reshallyn Mortel's Digital Menu & Ordering) */}
+          {isInventoryStaff && !isOwner && !isManager && (
+            <>
+              <div className="nav-section-title">Kitchen Orders (Module A)</div>
+              <a
+                href="http://localhost:5176/kitchen/orders"
+                onClick={handleOpenReservation}
+                className="nav-link"
+                style={{ opacity: 0.95, cursor: 'pointer', color: '#f87171' }}
+                title="Open Live Kitchen Display System (KDS)"
+              >
+                <UtensilsCrossed size={16} />
+                <span>Live Orders & KDS (Reshallyn)</span>
+                <ArrowRight size={13} style={{ marginLeft: 'auto', opacity: 0.7 }} />
+              </a>
+            </>
+          )}
+
+          {/* Inventory Navigation (Module B) */}
           {(isOwner || isManager || isInventoryStaff) && (
             <>
-              <div className="nav-section-title">Stockroom & Procurement</div>
+              <div className="nav-section-title">
+                {isInventoryStaff && !isOwner ? 'Kitchen Inventory (Module B)' : 'Stockroom & Procurement'}
+              </div>
               {(isOwner || isManager) && (
                 <NavLink to="/inventory/dashboard" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
                   <Boxes size={16} />
                   <span>Inventory Dashboard</span>
                 </NavLink>
               )}
-              <NavLink to="/inventory/items" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                <Package size={16} />
-                <span>Inventory Items</span>
-              </NavLink>
               <NavLink to="/inventory/stock-levels" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
                 <Boxes size={16} />
                 <span>Stock Levels</span>
               </NavLink>
+              <NavLink to="/inventory/items" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <Package size={16} />
+                <span>Inventory Items</span>
+              </NavLink>
               <NavLink to="/inventory/movements" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
                 <ArrowLeftRight size={16} />
                 <span>Stock Movements</span>
+              </NavLink>
+              <NavLink to="/inventory/alerts" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <AlertTriangle size={16} />
+                <span>Low-Stock Alerts</span>
+              </NavLink>
+              {/* Dish Availability (Management & Kitchen can toggle availability when ingredients run out) */}
+              <NavLink to="/pos/menu" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <UtensilsCrossed size={16} />
+                <span>Dish Availability</span>
               </NavLink>
               {(isOwner || isManager) && (
                 <>
@@ -142,26 +171,26 @@ export default function Sidebar() {
                   </NavLink>
                 </>
               )}
-              <NavLink to="/inventory/alerts" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                <AlertTriangle size={16} />
-                <span>Low-Stock Alerts</span>
-              </NavLink>
             </>
           )}
 
           {/* VikingsERP Ecosystem Links */}
-          <div className="nav-section-title">VikingsERP Integrated Modules</div>
-          <a
-            href="http://localhost:5176"
-            onClick={handleOpenReservation}
-            className="nav-link"
-            style={{ opacity: 0.9, cursor: 'pointer' }}
-            title="Single Sign-On into Reservation & Queue"
-          >
-            <Calendar size={16} />
-            <span>Reservation & Queue</span>
-            <ArrowRight size={13} style={{ marginLeft: 'auto', opacity: 0.7 }} />
-          </a>
+          {(!isInventoryStaff || isOwner || isManager) && (
+            <>
+              <div className="nav-section-title">VikingsERP Integrated Modules</div>
+              <a
+                href="http://localhost:5176"
+                onClick={handleOpenReservation}
+                className="nav-link"
+                style={{ opacity: 0.9, cursor: 'pointer' }}
+                title="Single Sign-On into Reservation & Queue"
+              >
+                <Calendar size={16} />
+                <span>Reservation & Queue</span>
+                <ArrowRight size={13} style={{ marginLeft: 'auto', opacity: 0.7 }} />
+              </a>
+            </>
+          )}
 
           {(isOwner || isManager) && (
             <>
