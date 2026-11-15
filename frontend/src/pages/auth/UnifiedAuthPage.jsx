@@ -63,6 +63,18 @@ export default function UnifiedAuthPage() {
       }
     }
 
+    if (redirectTarget === 'reservation' || redirectTarget === 'reshallyn' || redirectTarget === 'menu' || redirectTarget === 'queue') {
+      try {
+        const res = await authApi.getSsoToken();
+        if (res?.url) {
+          window.location.href = res.url;
+          return;
+        }
+      } catch (e) {
+        console.warn('SSO redirect to reservation failed, fallback to local routing:', e);
+      }
+    }
+
     if (user?.role === 'customer') {
       navigate('/customer', { replace: true });
     } else if (user?.role === 'cashier') {
@@ -86,6 +98,18 @@ export default function UnifiedAuthPage() {
         return;
       }
       window.location.href = 'http://localhost:5177/hr/dashboard';
+    } else if (user?.role === 'reservation_staff') {
+      try {
+        const res = await authApi.getSsoToken();
+        if (res?.url) {
+          window.location.href = res.url;
+          return;
+        }
+      } catch {
+        window.location.href = 'http://localhost:5176/staff/reservations';
+        return;
+      }
+      window.location.href = 'http://localhost:5176/staff/reservations';
     } else {
       const from = location.state?.from?.pathname || '/pos/orders';
       navigate(from, { replace: true });
