@@ -104,29 +104,11 @@ export default function Sidebar() {
             </>
           )}
 
-          {/* Kitchen Orders & KOT (Module A - Reshallyn Mortel's Digital Menu & Ordering) */}
-          {isInventoryStaff && !isOwner && !isManager && (
-            <>
-              <div className="nav-section-title">Kitchen Orders (Module A)</div>
-              <a
-                href="http://localhost:5176/kitchen/orders"
-                onClick={handleOpenReservation}
-                className="nav-link"
-                style={{ opacity: 0.95, cursor: 'pointer', color: '#f87171' }}
-                title="Open Live Kitchen Display System (KDS)"
-              >
-                <UtensilsCrossed size={16} />
-                <span>Live Orders & KDS (Reshallyn)</span>
-                <ArrowRight size={13} style={{ marginLeft: 'auto', opacity: 0.7 }} />
-              </a>
-            </>
-          )}
-
-          {/* Inventory Navigation (Module B) */}
+          {/* Inventory Navigation */}
           {(isOwner || isManager || isInventoryStaff) && (
             <>
               <div className="nav-section-title">
-                {isInventoryStaff && !isOwner ? 'Kitchen Inventory (Module B)' : 'Stockroom & Procurement'}
+                {isInventoryStaff && !isOwner ? 'Kitchen Inventory' : 'Stockroom & Procurement'}
               </div>
               {(isOwner || isManager) && (
                 <NavLink to="/inventory/dashboard" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
@@ -155,6 +137,25 @@ export default function Sidebar() {
                 <UtensilsCrossed size={16} />
                 <span>Dish Availability</span>
               </NavLink>
+
+              {/* Kitchen Orders & KDS (placed below Dish Availability) */}
+              {isInventoryStaff && !isOwner && !isManager && (
+                <>
+                  <div className="nav-section-title">Kitchen Orders</div>
+                  <a
+                    href="http://localhost:5176/kitchen/orders"
+                    onClick={handleOpenReservation}
+                    className="nav-link"
+                    style={{ opacity: 0.95, cursor: 'pointer', color: '#f87171' }}
+                    title="Open Live Kitchen Display System (KDS)"
+                  >
+                    <UtensilsCrossed size={16} />
+                    <span>Live Orders & KDS</span>
+                    <ArrowRight size={13} style={{ marginLeft: 'auto', opacity: 0.7 }} />
+                  </a>
+                </>
+              )}
+
               {(isOwner || isManager) && (
                 <>
                   <NavLink to="/inventory/suppliers" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
