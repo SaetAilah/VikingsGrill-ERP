@@ -42,86 +42,107 @@ export default function UnifiedAuthPage() {
   // Subtle Demo Autofill Dropdown
   const [showDemoMenu, setShowDemoMenu] = useState(false);
 
+  const [redirectParam, setRedirectParam] = useState(() => {
+    const p = new URLSearchParams(window.location.search);
+    return p.get('redirect');
+  });
+
   const redirectAfterLogin = async (user) => {
     const params = new URLSearchParams(window.location.search);
-    const redirectTarget = params.get('redirect');
+    const redirectTarget = redirectParam || params.get('redirect');
+    const role = user?.role;
 
-    if (redirectTarget === 'jewel' || redirectTarget === 'accounting' || redirectTarget === 'payroll') {
-      try {
-        const targetType = redirectTarget === 'payroll' ? 'payroll' : (user?.role === 'hr_staff' ? 'payroll' : 'accounting');
-        const res = await authApi.getSsoToken(targetType);
-        if (res?.url) {
-          window.location.href = res.url;
-          return;
-        }
-      } catch (e) {
-        console.warn('SSO redirect failed, fallback to local routing:', e);
-      }
-    }
-
-    if (redirectTarget === 'reservation' || redirectTarget === 'reshallyn' || redirectTarget === 'menu' || redirectTarget === 'queue') {
-      try {
-        const res = await authApi.getSsoToken();
-        if (res?.url) {
-          window.location.href = res.url;
-          return;
-        }
-      } catch (e) {
-        console.warn('SSO redirect to reservation failed, fallback to local routing:', e);
-      }
-    }
-
-    if (redirectTarget === 'feedback' || redirectTarget === 'crm' || redirectTarget === 'customer_feedback') {
-      try {
-        const res = await authApi.getSsoToken('feedback');
-        if (res?.url) {
-          window.location.href = res.url;
-          return;
-        }
-      } catch (e) {
-        console.warn('SSO redirect to feedback failed, fallback to local routing:', e);
-      }
-    }
-
-    if (user?.role === 'customer') {
-      navigate('/customer', { replace: true });
-    } else if (user?.role === 'cashier') {
-      // Cashiers always land directly on Front-of-House Order Processing
+    // 1. Front-of-House / Back-of-House roles: ALWAYS land on their respective station
+    if (role === 'cashier') {
       navigate('/pos/orders', { replace: true });
-    } else if (user?.role === 'kitchen_staff' || user?.role === 'inventory_staff') {
-      // Kitchen & Inventory Staff land on Kitchen Stock Levels
+      return;
+    }
+    if (role === 'kitchen_staff' || role === 'inventory_staff') {
       navigate('/inventory/stock-levels', { replace: true });
-    } else if (user?.role === 'accounting_staff') {
-      // Accounting & Finance Staff land on POS Sales Reconciliation & Audit
-      navigate('/pos/transactions', { replace: true });
-    } else if (user?.role === 'hr_staff') {
+      return;
+    }
+
+    // 2. Customer: land on Customer Portal (or Menu / Feedback if specifically requested)
+    if (role === 'customer') {
+      if (redirectTarget === 'menu' || redirectTarget === 'queue' || redirectTarget === 'reservation') {
+        try {
+          const res = await authApi.getSsoToken();
+          if (res?.url) { window.location.href = res.url; return; }
+        } catch {}
+      } else if (redirectTarget === 'feedback' || redirectTarget === 'crm') {
+        try {
+          const res = await authApi.getSsoToken('feedback');
+          if (res?.url) { window.location.href = res.url; return; }
+        } catch {}
+      }
+      navigate('/customer', { replace: true });
+      return;
+    }
+
+    // 3. HR Staff: always land on Jewel's HR Dashboard
+    if (role === 'hr_staff') {
       try {
         const res = await authApi.getSsoToken('payroll');
         if (res?.url) {
           window.location.href = res.url;
           return;
         }
-      } catch {
-        window.location.href = 'http://localhost:5177/hr/dashboard';
-        return;
+      } catch (e) {
+        console.warn('SSO redirect failed, fallback:', e);
       }
       window.location.href = 'http://localhost:5177/hr/dashboard';
-    } else if (user?.role === 'reservation_staff') {
+      return;
+    }
+
+    // 4. Accounting Staff: Jewel if requested, otherwise POS Reconciliation
+    if (role === 'accounting_staff') {
+      if (redirectTarget === 'jewel' || redirectTarget === 'accounting' || redirectTarget === 'payroll') {
+        try {
+          const res = await authApi.getSsoToken('accounting');
+          if (res?.url) { window.location.href = res.url; return; }
+        } catch {}
+      }
+      navigate('/pos/transactions', { replace: true });
+      return;
+    }
+
+    // 5. Reservation Staff: Reservation module
+    if (role === 'reservation_staff') {
       try {
         const res = await authApi.getSsoToken();
-        if (res?.url) {
-          window.location.href = res.url;
-          return;
-        }
-      } catch {
-        window.location.href = 'http://localhost:5176/staff/reservations';
-        return;
-      }
+        if (res?.url) { window.location.href = res.url; return; }
+      } catch {}
       window.location.href = 'http://localhost:5176/staff/reservations';
-    } else {
+      return;
+    }
+
+    // 6. Owner / Manager / Management (Executive access across all modules)
+    if (['Owner', 'Manager', 'management'].includes(role)) {
+      if (redirectTarget === 'jewel' || redirectTarget === 'accounting' || redirectTarget === 'payroll') {
+        try {
+          const targetType = redirectTarget === 'payroll' ? 'payroll' : 'accounting';
+          const res = await authApi.getSsoToken(targetType);
+          if (res?.url) { window.location.href = res.url; return; }
+        } catch {}
+      } else if (redirectTarget === 'reservation' || redirectTarget === 'reshallyn' || redirectTarget === 'menu' || redirectTarget === 'queue') {
+        try {
+          const res = await authApi.getSsoToken();
+          if (res?.url) { window.location.href = res.url; return; }
+        } catch {}
+      } else if (redirectTarget === 'feedback' || redirectTarget === 'crm' || redirectTarget === 'customer_feedback') {
+        try {
+          const res = await authApi.getSsoToken('feedback');
+          if (res?.url) { window.location.href = res.url; return; }
+        } catch {}
+      }
       const from = location.state?.from?.pathname || '/pos/orders';
       navigate(from, { replace: true });
+      return;
     }
+
+    // Default fallback
+    const from = location.state?.from?.pathname || '/pos/orders';
+    navigate(from, { replace: true });
   };
 
   const handleLoginSubmit = async (e) => {
@@ -192,6 +213,14 @@ export default function UnifiedAuthPage() {
     setLoginPassword('password123');
     setFormError('');
     setShowDemoMenu(false);
+
+    // If selecting an ERP role (e.g. cashier, kitchen) while a third-party redirect was in URL, clear redirect
+    const role = profile.role;
+    const isJewelRole = role === 'hr_staff' || role === 'accounting_staff' || role === 'Owner' || role === 'Manager';
+    if (!isJewelRole && redirectParam) {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      setRedirectParam(null);
+    }
   };
 
   return (
@@ -262,6 +291,42 @@ export default function UnifiedAuthPage() {
         padding: '32px',
         boxSizing: 'border-box',
       }}>
+        {/* Redirect Notice Banner */}
+        {redirectParam && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            backgroundColor: 'rgba(139, 26, 26, 0.15)',
+            border: '1px solid rgba(139, 26, 26, 0.35)',
+            borderRadius: '8px',
+            padding: '8px 12px',
+            marginBottom: '18px',
+            fontSize: '12px',
+            color: '#fca5a5',
+          }}>
+            <span>🔗 Returning to <strong>{redirectParam}</strong> module</span>
+            <button
+              type="button"
+              onClick={() => {
+                window.history.replaceState({}, document.title, window.location.pathname);
+                setRedirectParam(null);
+              }}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#ffffff',
+                cursor: 'pointer',
+                fontSize: '11px',
+                textDecoration: 'underline',
+                padding: '0 4px',
+              }}
+            >
+              Clear
+            </button>
+          </div>
+        )}
+
         {/* Tab Toggle (Sign In / Create Account) */}
         <div style={{
           display: 'grid',
