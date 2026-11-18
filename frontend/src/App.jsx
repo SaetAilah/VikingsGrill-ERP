@@ -40,6 +40,10 @@ function RoleDefaultRedirect() {
   if (user?.role === 'accounting_staff') {
     return <Navigate to="/pos/transactions" replace />;
   }
+  if (user?.role === 'hr_staff') {
+    window.location.href = 'http://localhost:5177/hr/dashboard';
+    return null;
+  }
   return <Navigate to="/pos/orders" replace />;
 }
 
