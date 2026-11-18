@@ -9,7 +9,7 @@ export default function MainLayout() {
       <Sidebar />
       <div className="main-content">
         <Navbar />
-        <main style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
+        <main className="content-scroll-area" style={{ flex: 1, padding: '24px', overflowY: 'auto' }}>
           <Outlet />
         </main>
       </div>
