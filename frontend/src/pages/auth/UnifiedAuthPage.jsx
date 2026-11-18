@@ -48,14 +48,10 @@ export default function UnifiedAuthPage() {
 
     if (redirectTarget === 'jewel' || redirectTarget === 'accounting' || redirectTarget === 'payroll') {
       try {
-        const targetType = redirectTarget === 'payroll' || user?.role === 'hr_staff' ? 'payroll' : 'accounting';
+        const targetType = redirectTarget === 'payroll' ? 'payroll' : (user?.role === 'hr_staff' ? 'payroll' : 'accounting');
         const res = await authApi.getSsoToken(targetType);
         if (res?.url) {
-          let destUrl = res.url;
-          if (user?.role === 'hr_staff') {
-            destUrl = destUrl.replace('/hr/payroll', '/hr/dashboard');
-          }
-          window.location.href = destUrl;
+          window.location.href = res.url;
           return;
         }
       } catch (e) {
@@ -102,7 +98,7 @@ export default function UnifiedAuthPage() {
       try {
         const res = await authApi.getSsoToken('payroll');
         if (res?.url) {
-          window.location.href = res.url.replace('/hr/payroll', '/hr/dashboard');
+          window.location.href = res.url;
           return;
         }
       } catch {

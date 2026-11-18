@@ -163,7 +163,13 @@ export const getSsoToken = async (req, res, next) => {
         { expiresIn: '8h' },
       );
 
-      const path = target === 'payroll' ? '/hr/payroll' : '/accounting/dashboard';
+      let path = '/accounting/dashboard';
+      if (user.role === 'hr_staff') {
+        path = target === 'payroll' ? '/hr/payroll' : '/hr/dashboard';
+      } else if (target === 'payroll') {
+        path = '/hr/payroll';
+      }
+
       return res.json({
         token: jewelToken,
         url: `http://localhost:5177${path}?token=${encodeURIComponent(jewelToken)}`,
