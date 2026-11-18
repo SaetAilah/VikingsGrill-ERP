@@ -79,10 +79,11 @@ export default function UnifiedAuthPage() {
       return;
     }
 
-    // 3. HR Staff: always land on Jewel's HR Dashboard
+    // 3. HR Staff: always land on Jewel's HR Dashboard (or payroll if requested)
     if (role === 'hr_staff') {
       try {
-        const res = await authApi.getSsoToken('payroll');
+        const targetType = redirectTarget === 'payroll' ? 'payroll' : 'jewel';
+        const res = await authApi.getSsoToken(targetType);
         if (res?.url) {
           window.location.href = res.url;
           return;
@@ -159,10 +160,9 @@ export default function UnifiedAuthPage() {
     try {
       const result = await login(loginEmail, loginPassword);
       setFormSuccess('Signing you in...');
-      setTimeout(() => redirectAfterLogin(result.user), 400);
+      await redirectAfterLogin(result.user);
     } catch (err) {
-      setFormError(err.message || 'Invalid email or password.');
-    } finally {
+      setFormError(err.response?.data?.error || err.message || 'Invalid email or password.');
       setLoading(false);
     }
   };
@@ -198,10 +198,9 @@ export default function UnifiedAuthPage() {
       });
 
       setFormSuccess('Account created successfully!');
-      setTimeout(() => redirectAfterLogin(result.user), 400);
+      await redirectAfterLogin(result.user);
     } catch (err) {
-      setFormError(err.message || 'Registration failed. Email may already be in use.');
-    } finally {
+      setFormError(err.response?.data?.error || err.message || 'Registration failed. Email may already be in use.');
       setLoading(false);
     }
   };
@@ -210,7 +209,7 @@ export default function UnifiedAuthPage() {
     const profile = DEMO_PROFILES[profileKey];
     if (!profile) return;
     setLoginEmail(profile.email);
-    setLoginPassword('password123');
+    setLoginPassword('Vikings2026!');
     setFormError('');
     setShowDemoMenu(false);
 

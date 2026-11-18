@@ -147,7 +147,7 @@ export const getSsoToken = async (req, res, next) => {
     const user = req.user;
     if (!user) return res.status(401).json({ error: 'Unauthenticated.' });
 
-    const target = req.query.target || 'reservation';
+    const target = req.query.target || req.body?.target || 'reservation';
 
     if (target === 'accounting' || target === 'payroll' || target === 'jewel') {
       const jewelSecret = process.env.JEWEL_JWT_SECRET || 'viking_grill_jewel_jwt_secret_2026';
