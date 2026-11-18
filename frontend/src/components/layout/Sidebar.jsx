@@ -71,9 +71,8 @@ export default function Sidebar() {
 
   return (
     <aside className="unified-sidebar">
-      <div>
-        <div className="sidebar-header">
-          <div className="sidebar-brand">
+      <div className="sidebar-header">
+        <div className="sidebar-brand">
             <div className="brand-badge">VG</div>
             <div className="brand-text">
               <h1>VIKINGS GRILL</h1>
@@ -304,7 +303,6 @@ export default function Sidebar() {
             </>
           )}
         </div>
-      </div>
 
       <div className="sidebar-footer">
         <div className="user-profile-bar">

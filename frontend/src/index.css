@@ -34,9 +34,12 @@
   --color-primary-hover: #a10d0d;
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   background-color: #0d0d0d;
   color: #f0f0f0;
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -46,9 +49,10 @@ body {
 /* App Shell Layout */
 .app-container {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
   width: 100vw;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .main-content {
@@ -58,6 +62,7 @@ body {
   overflow: hidden;
   height: 100vh;
   max-height: 100vh;
+  min-width: 0;
 }
 
 /* Unified Navigation Sidebar */
@@ -68,14 +73,17 @@ body {
   border-right: 1px solid #222222;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .sidebar-header {
   padding: 20px 16px;
   border-bottom: 1px solid #1f1f1f;
+  flex-shrink: 0;
 }
 
 .sidebar-brand {
@@ -121,7 +129,9 @@ body {
 /* --- 1. SIDEBAR SCROLLBAR (Ultra-thin 4px, Minimalist, Transparent Track) --- */
 .sidebar-scroll {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 12px 10px;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
@@ -155,6 +165,13 @@ main,
 body {
   scrollbar-width: thin;
   scrollbar-color: #333333 #121212;
+}
+
+.content-scroll-area {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 ::-webkit-scrollbar {
@@ -219,6 +236,7 @@ body {
   padding: 14px 16px;
   border-top: 1px solid #1f1f1f;
   background: #0e0e0e;
+  flex-shrink: 0;
 }
 
 .user-profile-bar {
