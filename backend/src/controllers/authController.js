@@ -212,6 +212,13 @@ export const getSsoToken = async (req, res, next) => {
       { expiresIn: '24h' },
     );
 
+    if (target === 'kpi' || target === 'ra' || target === 'reporting') {
+      return res.json({
+        token: ssoToken,
+        url: `http://localhost:5175?token=${encodeURIComponent(ssoToken)}`,
+      });
+    }
+
     let destinationPath = '/staff/reservations';
     if (user.role === 'customer') destinationPath = '/menu';
     else if (user.role === 'kitchen_staff') destinationPath = '/kitchen/orders';

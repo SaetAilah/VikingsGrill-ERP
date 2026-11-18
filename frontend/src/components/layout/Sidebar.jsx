@@ -40,21 +40,7 @@ export default function Sidebar() {
         .toUpperCase()
     : 'VG';
 
-  const handleOpenReservation = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await authApi.getSsoToken();
-      if (res?.url) {
-        window.location.href = res.url;
-        return;
-      }
-    } catch (err) {
-      console.warn('SSO token acquisition failed, fallback to direct url:', err);
-    }
-    window.location.href = 'http://localhost:5176';
-  };
-
-  const handleOpenJewel = async (e, target) => {
+  const handleOpenModule = async (e, target) => {
     e.preventDefault();
     try {
       const res = await authApi.getSsoToken(target);
@@ -63,10 +49,17 @@ export default function Sidebar() {
         return;
       }
     } catch (err) {
-      console.warn('SSO token acquisition failed, fallback to direct url:', err);
+      console.warn(`SSO token acquisition failed for ${target}:`, err);
     }
-    const path = target === 'payroll' ? '/hr/payroll' : '/accounting/dashboard';
-    window.location.href = `http://localhost:5177${path}`;
+    const fallbacks = {
+      reservation: 'http://localhost:5176/management/dashboard',
+      jewel: 'http://localhost:5177/accounting/dashboard',
+      accounting: 'http://localhost:5177/accounting/dashboard',
+      payroll: 'http://localhost:5177/hr/payroll',
+      feedback: 'http://localhost:5178/management/feedback',
+      kpi: 'http://localhost:5175',
+    };
+    window.location.href = fallbacks[target] || 'http://localhost:5173';
   };
 
   return (
@@ -116,7 +109,7 @@ export default function Sidebar() {
               <div className="nav-section-title">Accounting & Finance</div>
               <a
                 href="http://localhost:5177/accounting/dashboard"
-                onClick={(e) => handleOpenJewel(e, 'accounting')}
+                onClick={(e) => handleOpenModule(e, 'accounting')}
                 className="nav-link"
                 style={{ opacity: 0.95, cursor: 'pointer', color: '#f87171' }}
                 title="Open Primary Accounting Dashboard & Financial Statements"
@@ -205,7 +198,7 @@ export default function Sidebar() {
                   <div className="nav-section-title">Kitchen Orders</div>
                   <a
                     href="http://localhost:5176/kitchen/orders"
-                    onClick={handleOpenReservation}
+                    onClick={(e) => handleOpenModule(e, 'reservation')}
                     className="nav-link"
                     style={{ opacity: 0.95, cursor: 'pointer', color: '#f87171' }}
                     title="Open Live Kitchen Display System (KDS)"
@@ -242,9 +235,9 @@ export default function Sidebar() {
               <div className="nav-section-title">VikingsERP Integrated Modules</div>
               <a
                 href="http://localhost:5176"
-                onClick={handleOpenReservation}
+                onClick={(e) => handleOpenModule(e, 'reservation')}
                 className="nav-link"
-                style={{ opacity: 0.9, cursor: 'pointer' }}
+                style={{ opacity: 0.95, cursor: 'pointer' }}
                 title="Single Sign-On into Reservation & Queue"
               >
                 <Calendar size={16} />
@@ -258,36 +251,36 @@ export default function Sidebar() {
             <>
               <a
                 href="http://localhost:5177"
-                target="_blank"
-                rel="noreferrer"
+                onClick={(e) => handleOpenModule(e, 'jewel')}
                 className="nav-link"
-                style={{ opacity: 0.9 }}
+                style={{ opacity: 0.95, cursor: 'pointer' }}
+                title="Single Sign-On into HR & Accounting"
               >
                 <DollarSign size={16} />
                 <span>HR & Accounting</span>
-                <ExternalLink size={12} style={{ marginLeft: 'auto' }} />
+                <ArrowRight size={13} style={{ marginLeft: 'auto', opacity: 0.7 }} />
               </a>
               <a
                 href="http://localhost:5178"
-                target="_blank"
-                rel="noreferrer"
+                onClick={(e) => handleOpenModule(e, 'feedback')}
                 className="nav-link"
-                style={{ opacity: 0.9 }}
+                style={{ opacity: 0.95, cursor: 'pointer' }}
+                title="Single Sign-On into Customer Feedback"
               >
                 <Star size={16} />
                 <span>Customer Feedback</span>
-                <ExternalLink size={12} style={{ marginLeft: 'auto' }} />
+                <ArrowRight size={13} style={{ marginLeft: 'auto', opacity: 0.7 }} />
               </a>
               <a
                 href="http://localhost:5175"
-                target="_blank"
-                rel="noreferrer"
+                onClick={(e) => handleOpenModule(e, 'kpi')}
                 className="nav-link"
-                style={{ opacity: 0.9 }}
+                style={{ opacity: 0.95, cursor: 'pointer' }}
+                title="Open Reporting & KPI Suite"
               >
                 <TrendingUp size={16} />
                 <span>Reporting & KPI Suite</span>
-                <ExternalLink size={12} style={{ marginLeft: 'auto' }} />
+                <ArrowRight size={13} style={{ marginLeft: 'auto', opacity: 0.7 }} />
               </a>
             </>
           )}
