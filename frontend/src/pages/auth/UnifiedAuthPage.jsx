@@ -214,10 +214,14 @@ export default function UnifiedAuthPage() {
     setFormError('');
     setShowDemoMenu(false);
 
-    // If selecting an ERP role (e.g. cashier, kitchen) while a third-party redirect was in URL, clear redirect
+    // If selecting a role not matching the third-party redirect in URL, clear redirect
     const role = profile.role;
-    const isJewelRole = role === 'hr_staff' || role === 'accounting_staff' || role === 'Owner' || role === 'Manager';
-    if (!isJewelRole && redirectParam) {
+    const isMatchingRedirect = 
+      (role === 'reservation_staff' && (redirectParam === 'reservation' || redirectParam === 'reshallyn')) ||
+      (['hr_staff', 'accounting_staff'].includes(role) && ['jewel', 'accounting', 'payroll'].includes(redirectParam)) ||
+      (role === 'customer' && ['feedback', 'crm', 'menu', 'queue', 'reservation'].includes(redirectParam)) ||
+      ['Owner', 'Manager'].includes(role);
+    if (!isMatchingRedirect && redirectParam) {
       window.history.replaceState({}, document.title, window.location.pathname);
       setRedirectParam(null);
     }
@@ -545,6 +549,7 @@ export default function UnifiedAuthPage() {
                       { key: 'kitchen', label: 'Kitchen Lead' },
                       { key: 'hr', label: 'HR Specialist' },
                       { key: 'accounting', label: 'Accountant' },
+                      { key: 'reservation', label: 'Front Desk / Reservation' },
                       { key: 'customer', label: 'Customer (Juan)' },
                     ].map((item) => (
                       <button

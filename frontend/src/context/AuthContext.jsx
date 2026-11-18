@@ -53,6 +53,14 @@ export const DEMO_PROFILES = {
     phone: '09170000006',
     demo: false,
   },
+  reservation: {
+    id: 9,
+    name: 'Front Desk & Reservation',
+    email: 'reservation@vikingsgrill.example',
+    role: 'reservation_staff',
+    phone: '09170000008',
+    demo: false,
+  },
   customer: {
     id: 7,
     name: 'Juan Dela Cruz',

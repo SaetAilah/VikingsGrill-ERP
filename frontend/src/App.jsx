@@ -47,6 +47,16 @@ function RoleDefaultRedirect() {
           window.location.href = 'http://localhost:5177/hr/dashboard';
         });
     }
+    if (user?.role === 'reservation_staff') {
+      authApi.getSsoToken('reservation')
+        .then((res) => {
+          if (res?.url) window.location.href = res.url;
+          else window.location.href = 'http://localhost:5176/staff/reservations';
+        })
+        .catch(() => {
+          window.location.href = 'http://localhost:5176/staff/reservations';
+        });
+    }
   }, [user]);
 
   if (user?.role === 'kitchen_staff' || user?.role === 'inventory_staff') {
@@ -54,6 +64,13 @@ function RoleDefaultRedirect() {
   }
   if (user?.role === 'accounting_staff') {
     return <Navigate to="/pos/transactions" replace />;
+  }
+  if (user?.role === 'reservation_staff') {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#121212', color: '#fff' }}>
+        Redirecting to Reservation & Queue System...
+      </div>
+    );
   }
   if (user?.role === 'hr_staff') {
     return (
