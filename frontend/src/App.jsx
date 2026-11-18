@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/layout/MainLayout.jsx';
 import { useAuth } from './context/AuthContext.jsx';
+import { authApi } from './services/authApi.js';
 import { PosProvider } from './context/PosContext.jsx';
 import { InventoryProvider } from './context/InventoryContext.jsx';
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
@@ -34,6 +35,20 @@ import TeamManagement from './pages/TeamManagement.jsx';
 
 function RoleDefaultRedirect() {
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (user?.role === 'hr_staff') {
+      authApi.getSsoToken('jewel')
+        .then((res) => {
+          if (res?.url) window.location.href = res.url;
+          else window.location.href = 'http://localhost:5177/hr/dashboard';
+        })
+        .catch(() => {
+          window.location.href = 'http://localhost:5177/hr/dashboard';
+        });
+    }
+  }, [user]);
+
   if (user?.role === 'kitchen_staff' || user?.role === 'inventory_staff') {
     return <Navigate to="/inventory/stock-levels" replace />;
   }
@@ -41,8 +56,11 @@ function RoleDefaultRedirect() {
     return <Navigate to="/pos/transactions" replace />;
   }
   if (user?.role === 'hr_staff') {
-    window.location.href = 'http://localhost:5177/hr/dashboard';
-    return null;
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#121212', color: '#fff' }}>
+        Redirecting to HR Dashboard...
+      </div>
+    );
   }
   return <Navigate to="/pos/orders" replace />;
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth, DEMO_PROFILES } from '../../context/AuthContext.jsx';
+import { authApi } from '../../services/authApi.js';
 import {
   LogIn,
   UserPlus,
