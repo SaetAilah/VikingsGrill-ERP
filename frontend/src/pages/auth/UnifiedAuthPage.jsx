@@ -18,7 +18,7 @@ import {
 export default function UnifiedAuthPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, register, loginAsDemo } = useAuth();
+  const { user, logout, login, register, loginAsDemo } = useAuth();
 
   const [mode, setMode] = useState('login'); // 'login' | 'register'
   const [showPassword, setShowPassword] = useState(false);
@@ -205,7 +205,7 @@ export default function UnifiedAuthPage() {
     }
   };
 
-  const handleSelectDemoRole = (profileKey) => {
+  const handleSelectDemoRole = async (profileKey) => {
     const profile = DEMO_PROFILES[profileKey];
     if (!profile) return;
     setLoginEmail(profile.email);
@@ -219,6 +219,17 @@ export default function UnifiedAuthPage() {
     if (!isJewelRole && redirectParam) {
       window.history.replaceState({}, document.title, window.location.pathname);
       setRedirectParam(null);
+    }
+
+    // Direct one-click login for demo accounts
+    setLoading(true);
+    setFormSuccess(`Signing in as ${profile.name}...`);
+    try {
+      const result = await login(profile.email, 'Vikings2026!');
+      await redirectAfterLogin(result.user);
+    } catch (err) {
+      setFormError(err.response?.data?.error || err.message || 'Login failed.');
+      setLoading(false);
     }
   };
 
@@ -322,6 +333,43 @@ export default function UnifiedAuthPage() {
               }}
             >
               Clear
+            </button>
+          </div>
+        )}
+
+        {/* Current Active Session Notice */}
+        {user && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            backgroundColor: 'rgba(21, 101, 192, 0.15)',
+            border: '1px solid rgba(21, 101, 192, 0.4)',
+            borderRadius: '8px',
+            padding: '10px 14px',
+            marginBottom: '18px',
+            fontSize: '12px',
+            color: '#90caf9',
+          }}>
+            <span>👤 Active session: <strong>{user.name}</strong> ({user.role})</span>
+            <button
+              type="button"
+              onClick={async () => {
+                await logout();
+                setFormSuccess('Signed out. Select HR Specialist below to continue.');
+              }}
+              style={{
+                background: '#8B1A1A',
+                border: 'none',
+                color: '#ffffff',
+                cursor: 'pointer',
+                fontSize: '11px',
+                borderRadius: '4px',
+                padding: '4px 8px',
+                fontWeight: 600,
+              }}
+            >
+              Sign Out
             </button>
           </div>
         )}
@@ -600,6 +648,56 @@ export default function UnifiedAuthPage() {
             >
               {loading ? 'Signing In...' : 'Sign In'}
             </button>
+
+            {/* Quick Demo Access Bar */}
+            <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #282828' }}>
+              <p style={{ margin: '0 0 10px', fontSize: '11px', color: '#888888', textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'center' }}>
+                Instant 1-Click Role Sign In
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                {[
+                  { key: 'hr', label: 'HR Specialist', desc: 'HR & Payroll (Jewel)' },
+                  { key: 'cashier', label: 'Lead Cashier', desc: 'POS Station' },
+                  { key: 'kitchen', label: 'Kitchen Lead', desc: 'Stock & KDS' },
+                  { key: 'owner', label: 'Owner Saet', desc: 'Full Executive' },
+                ].map((btn) => (
+                  <button
+                    key={btn.key}
+                    type="button"
+                    disabled={loading}
+                    onClick={() => handleSelectDemoRole(btn.key)}
+                    style={{
+                      padding: '8px 10px',
+                      backgroundColor: btn.key === 'hr' ? 'rgba(139, 26, 26, 0.25)' : '#1c1c1c',
+                      border: btn.key === 'hr' ? '1px solid #8B1A1A' : '1px solid #333333',
+                      borderRadius: '6px',
+                      color: '#FFFFFF',
+                      cursor: loading ? 'not-allowed' : 'pointer',
+                      textAlign: 'left',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '2px',
+                      transition: 'all 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = '#2a2a2a';
+                      e.currentTarget.style.borderColor = '#8B1A1A';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = btn.key === 'hr' ? 'rgba(139, 26, 26, 0.25)' : '#1c1c1c';
+                      e.currentTarget.style.borderColor = btn.key === 'hr' ? '#8B1A1A' : '#333333';
+                    }}
+                  >
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: btn.key === 'hr' ? '#fca5a5' : '#FFFFFF' }}>
+                      {btn.label}
+                    </span>
+                    <span style={{ fontSize: '10px', color: '#888888' }}>
+                      {btn.desc}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </form>
         ) : (
           /* ─── TAB 2: CREATE ACCOUNT ──────────────────────────────────── */
