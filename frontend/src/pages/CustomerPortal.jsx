@@ -360,8 +360,6 @@ export default function CustomerPortal() {
               <span>{loadingTarget === 'feedback' ? 'Connecting...' : 'Submit Dining Review'}</span>
               <ExternalLink size={14} />
             </button>
-              <ExternalLink size={14} />
-            </a>
           </div>
         </div>
 
