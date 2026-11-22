@@ -220,9 +220,14 @@ export const getSsoToken = async (req, res, next) => {
     }
 
     let destinationPath = '/staff/reservations';
-    if (user.role === 'customer') destinationPath = '/menu';
-    else if (user.role === 'kitchen_staff') destinationPath = '/kitchen/orders';
-    else if (['Owner', 'Manager', 'management'].includes(user.role)) destinationPath = '/management/dashboard';
+    const isCustomerRole = (user.role || '').toLowerCase() === 'customer';
+    if (isCustomerRole) {
+      destinationPath = (target === 'menu' || target === 'digital_menu') ? '/menu' : '/reservation';
+    } else if (user.role === 'kitchen_staff') {
+      destinationPath = '/kitchen/orders';
+    } else if (['Owner', 'Manager', 'management'].includes(user.role)) {
+      destinationPath = '/management/dashboard';
+    }
 
     res.json({
       token: ssoToken,

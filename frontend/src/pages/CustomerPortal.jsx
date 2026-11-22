@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
+import authApi from '../services/authApi.js';
 import {
   Calendar,
   UtensilsCrossed,
@@ -14,6 +15,29 @@ import {
 
 export default function CustomerPortal() {
   const { user, logout } = useAuth();
+  const [loadingTarget, setLoadingTarget] = useState(null);
+
+  const handleOpenCustomerModule = async (e, target) => {
+    e.preventDefault();
+    setLoadingTarget(target);
+    try {
+      const res = await authApi.getSsoToken(target);
+      if (res?.url) {
+        window.location.href = res.url;
+        return;
+      }
+    } catch (err) {
+      console.warn(`SSO token acquisition failed for ${target}:`, err);
+    } finally {
+      setLoadingTarget(null);
+    }
+    const fallbacks = {
+      reservation: 'http://localhost:5176/reservation',
+      menu: 'http://localhost:5176/menu',
+      feedback: 'http://localhost:5178/feedback',
+    };
+    window.location.href = fallbacks[target] || 'http://localhost:5173';
+  };
 
   return (
     <div style={{
@@ -198,10 +222,9 @@ export default function CustomerPortal() {
                 Book dining tables, reserve Billiards or KTV rooms in advance, and check live queue position at Vikings Grill.
               </p>
             </div>
-            <a
-              href="http://localhost:5176"
-              target="_blank"
-              rel="noreferrer"
+            <button
+              onClick={(e) => handleOpenCustomerModule(e, 'reservation')}
+              disabled={loadingTarget === 'reservation'}
               style={{
                 marginTop: '20px',
                 display: 'inline-flex',
@@ -212,14 +235,17 @@ export default function CustomerPortal() {
                 borderRadius: '8px',
                 background: 'linear-gradient(135deg, #0284c7, #0369a1)',
                 color: '#ffffff',
-                textDecoration: 'none',
+                border: 'none',
+                cursor: loadingTarget === 'reservation' ? 'wait' : 'pointer',
                 fontSize: '13px',
                 fontWeight: 600,
+                opacity: loadingTarget === 'reservation' ? 0.7 : 1,
+                transition: 'all 0.15s ease',
               }}
             >
-              <span>Open Reservation Portal</span>
+              <span>{loadingTarget === 'reservation' ? 'Connecting...' : 'Open Reservation Portal'}</span>
               <ExternalLink size={14} />
-            </a>
+            </button>
           </div>
 
           {/* Card 2: Digital Food & Drink Menu */}
@@ -253,10 +279,9 @@ export default function CustomerPortal() {
                 Explore Grilled Pork Belly, Chicken Inasal, KTV Party Packages, and order directly from your mobile table QR code.
               </p>
             </div>
-            <a
-              href="http://localhost:5176"
-              target="_blank"
-              rel="noreferrer"
+            <button
+              onClick={(e) => handleOpenCustomerModule(e, 'menu')}
+              disabled={loadingTarget === 'menu'}
               style={{
                 marginTop: '20px',
                 display: 'inline-flex',
@@ -267,14 +292,17 @@ export default function CustomerPortal() {
                 borderRadius: '8px',
                 background: 'linear-gradient(135deg, #d97706, #b45309)',
                 color: '#ffffff',
-                textDecoration: 'none',
+                border: 'none',
+                cursor: loadingTarget === 'menu' ? 'wait' : 'pointer',
                 fontSize: '13px',
                 fontWeight: 600,
+                opacity: loadingTarget === 'menu' ? 0.7 : 1,
+                transition: 'all 0.15s ease',
               }}
             >
-              <span>Explore Food & Drink Menu</span>
+              <span>{loadingTarget === 'menu' ? 'Connecting...' : 'Explore Food & Drink Menu'}</span>
               <ExternalLink size={14} />
-            </a>
+            </button>
           </div>
 
           {/* Card 3: Customer Feedback & Reviews */}
@@ -308,10 +336,9 @@ export default function CustomerPortal() {
                 Rate your dining experience, submit service feedback, and earn points on your customer loyalty profile.
               </p>
             </div>
-            <a
-              href="http://localhost:5178"
-              target="_blank"
-              rel="noreferrer"
+            <button
+              onClick={(e) => handleOpenCustomerModule(e, 'feedback')}
+              disabled={loadingTarget === 'feedback'}
               style={{
                 marginTop: '20px',
                 display: 'inline-flex',
@@ -322,12 +349,17 @@ export default function CustomerPortal() {
                 borderRadius: '8px',
                 background: 'linear-gradient(135deg, #db2777, #be185d)',
                 color: '#ffffff',
-                textDecoration: 'none',
+                border: 'none',
+                cursor: loadingTarget === 'feedback' ? 'wait' : 'pointer',
                 fontSize: '13px',
                 fontWeight: 600,
+                opacity: loadingTarget === 'feedback' ? 0.7 : 1,
+                transition: 'all 0.15s ease',
               }}
             >
-              <span>Submit Dining Review</span>
+              <span>{loadingTarget === 'feedback' ? 'Connecting...' : 'Submit Dining Review'}</span>
+              <ExternalLink size={14} />
+            </button>
               <ExternalLink size={14} />
             </a>
           </div>
