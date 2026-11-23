@@ -12,7 +12,8 @@ export const requireAccountingOrManagement = requireRole(
   'Manager',
   'management',
   'administrator',
-  'accounting_staff'
+  'accounting_staff',
+  'cashier'
 );
 export const requireProcurementAccess = requireRole(
   'Owner',

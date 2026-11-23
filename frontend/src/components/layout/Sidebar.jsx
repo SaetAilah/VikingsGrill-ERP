@@ -143,23 +143,21 @@ export default function Sidebar() {
                 <Receipt size={16} />
                 <span>Receipt Screen</span>
               </NavLink>
+              <NavLink to="/pos/transactions" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                <History size={16} />
+                <span>Transaction History</span>
+              </NavLink>
               {(isOwner || isManager) && (
-                <>
-                  <NavLink to="/pos/transactions" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                    <History size={16} />
-                    <span>Transaction History</span>
-                  </NavLink>
-                  <NavLink to="/pos/sales-reports" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                    <TrendingUp size={16} />
-                    <span>Sales Reports</span>
-                  </NavLink>
-                </>
+                <NavLink to="/pos/sales-reports" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                  <TrendingUp size={16} />
+                  <span>Sales Reports</span>
+                </NavLink>
               )}
             </>
           )}
 
-          {/* ─── INVENTORY NAVIGATION (Kitchen Staff, Owner, Manager) ─── */}
-          {!isAccounting && (isOwner || isManager || isInventoryStaff) && (
+          {/* ─── INVENTORY NAVIGATION (Kitchen Staff, Owner, Manager, Cashier Stock Audit) ─── */}
+          {!isAccounting && (
             <>
               <div className="nav-section-title">
                 {isInventoryStaff && !isOwner ? 'Kitchen Inventory' : 'Stockroom & Procurement'}
@@ -170,27 +168,34 @@ export default function Sidebar() {
                   <span>Inventory Dashboard</span>
                 </NavLink>
               )}
-              <NavLink to="/inventory/stock-levels" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                <Boxes size={16} />
-                <span>Stock Levels</span>
-              </NavLink>
-              <NavLink to="/inventory/items" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                <Package size={16} />
-                <span>Inventory Items</span>
-              </NavLink>
+              {(isOwner || isManager || isInventoryStaff) && (
+                <NavLink to="/inventory/stock-levels" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                  <Boxes size={16} />
+                  <span>Stock Levels</span>
+                </NavLink>
+              )}
+              {(isOwner || isManager || isInventoryStaff) && (
+                <NavLink to="/inventory/items" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                  <Package size={16} />
+                  <span>Inventory Items</span>
+                </NavLink>
+              )}
               <NavLink to="/inventory/movements" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
                 <ArrowLeftRight size={16} />
                 <span>Stock Movements</span>
               </NavLink>
-              <NavLink to="/inventory/alerts" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                <AlertTriangle size={16} />
-                <span>Low-Stock Alerts</span>
-              </NavLink>
-              {/* Dish Availability (Management & Kitchen can toggle availability when ingredients run out) */}
-              <NavLink to="/pos/menu" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-                <UtensilsCrossed size={16} />
-                <span>Dish Availability</span>
-              </NavLink>
+              {(isOwner || isManager || isInventoryStaff) && (
+                <NavLink to="/inventory/alerts" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                  <AlertTriangle size={16} />
+                  <span>Low-Stock Alerts</span>
+                </NavLink>
+              )}
+              {(isOwner || isManager || isInventoryStaff) && (
+                <NavLink to="/pos/menu" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                  <UtensilsCrossed size={16} />
+                  <span>Dish Availability</span>
+                </NavLink>
+              )}
 
               {/* Kitchen Orders & KDS (placed below Dish Availability) */}
               {isInventoryStaff && !isOwner && !isManager && (
